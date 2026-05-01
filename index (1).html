@@ -1,0 +1,682 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Lex Vox — Conversor de Texto a Voz Jurídica</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=EB+Garamond:ital,wght@0,400;0,500;0,600;1,400&family=Barlow+Condensed:wght@300;400;500;600&display=swap" rel="stylesheet">
+<style>
+*{box-sizing:border-box;margin:0;padding:0}
+:root{
+  --bg:#0d0d0f;--surface:#141418;--surface2:#1c1c22;--border:#2a2a35;
+  --gold:#c9a84c;--gold2:#e8c96e;--text:#e8e6de;--muted:#7a7870;
+}
+body{background:var(--bg);color:var(--text);font-family:'EB Garamond',serif;min-height:100vh;overflow-x:hidden}
+
+.letterhead{background:linear-gradient(180deg,#0a0a0c 0%,var(--bg) 100%);border-bottom:1px solid var(--border);padding:2.5rem 2rem 2rem;text-align:center;position:relative}
+.letterhead::before{content:'';position:absolute;top:0;left:0;right:0;height:3px;background:linear-gradient(90deg,transparent,var(--gold),var(--gold2),var(--gold),transparent)}
+.seal{width:60px;height:60px;border:1.5px solid var(--gold);border-radius:50%;display:flex;align-items:center;justify-content:center;margin:0 auto 1.2rem;position:relative}
+.seal::before{content:'';position:absolute;inset:5px;border:0.5px solid var(--gold);border-radius:50%;opacity:0.35}
+.seal svg{width:26px;height:26px}
+h1{font-family:'Barlow Condensed',sans-serif;font-size:26px;font-weight:600;letter-spacing:4px;text-transform:uppercase;color:var(--gold2);margin-bottom:6px}
+.subtitle{font-size:13px;color:var(--muted);letter-spacing:2px;text-transform:uppercase;font-family:'Barlow Condensed',sans-serif;font-weight:300}
+.ornament{color:var(--gold);opacity:0.5;letter-spacing:10px;font-size:11px;margin-top:10px}
+
+.main{max-width:800px;margin:0 auto;padding:2rem 1.5rem}
+
+.panel{background:var(--surface);border:0.5px solid var(--border);border-radius:2px;margin-bottom:1rem;overflow:hidden}
+.panel-header{padding:11px 18px;border-bottom:0.5px solid var(--border);display:flex;align-items:center;gap:10px}
+.panel-label{font-family:'Barlow Condensed',sans-serif;font-size:11px;letter-spacing:2px;text-transform:uppercase;color:var(--muted)}
+.badge{background:var(--gold);color:#000;font-family:'Barlow Condensed',sans-serif;font-size:9px;letter-spacing:1px;padding:2px 8px;text-transform:uppercase;font-weight:600;margin-left:auto;border-radius:1px}
+.badge-green{background:#2d5a1b;color:#7ecf4a;border:0.5px solid #3a7522}
+
+.drop-zone{border:1px dashed var(--border);margin:18px;border-radius:2px;padding:2.2rem;text-align:center;cursor:pointer;transition:all 0.2s;position:relative;overflow:hidden}
+.drop-zone:hover,.drop-zone.drag-over{border-color:var(--gold);background:rgba(201,168,76,0.04)}
+.drop-zone input[type=file]{position:absolute;inset:0;opacity:0;cursor:pointer;width:100%;height:100%}
+.drop-icon{width:34px;height:34px;margin:0 auto 14px;opacity:0.35}
+.drop-title{font-size:16px;color:var(--text);margin-bottom:5px}
+.drop-sub{font-size:12px;color:var(--muted);font-family:'Barlow Condensed',sans-serif;letter-spacing:0.5px}
+.formats{display:flex;gap:6px;justify-content:center;flex-wrap:wrap;margin-top:12px}
+.fmt{background:var(--surface2);border:0.5px solid var(--border);padding:3px 10px;font-family:'Barlow Condensed',sans-serif;font-size:10px;letter-spacing:1px;color:var(--muted);text-transform:uppercase;border-radius:1px}
+
+.divider{display:flex;align-items:center;gap:12px;padding:0 18px 6px;color:var(--muted);font-size:11px;font-family:'Barlow Condensed',sans-serif;letter-spacing:2px;text-transform:uppercase}
+.divider::before,.divider::after{content:'';flex:1;height:0.5px;background:var(--border)}
+
+textarea{width:calc(100% - 36px);margin:0 18px 18px;background:var(--surface2);border:0.5px solid var(--border);border-radius:2px;color:var(--text);font-family:'EB Garamond',serif;font-size:15px;line-height:1.75;padding:14px 16px;resize:vertical;min-height:130px;outline:none;transition:border-color 0.2s;display:block}
+textarea:focus{border-color:var(--gold)}
+textarea::placeholder{color:var(--muted);font-style:italic}
+
+.config-grid{display:grid;grid-template-columns:1fr 1fr;gap:1px;background:var(--border)}
+.config-cell{background:var(--surface);padding:16px 18px}
+.config-cell.full{grid-column:1/-1}
+.cfg-label{font-family:'Barlow Condensed',sans-serif;font-size:10px;letter-spacing:2px;text-transform:uppercase;color:var(--muted);margin-bottom:10px}
+
+select{background:var(--surface2);border:0.5px solid var(--border);color:var(--text);font-family:'EB Garamond',serif;font-size:14px;padding:8px 12px;width:100%;outline:none;border-radius:2px;cursor:pointer;transition:border-color 0.2s}
+select:focus{border-color:var(--gold)}
+select option{background:#1c1c22}
+
+.slider-wrap{display:flex;align-items:center;gap:12px}
+.slider-limit{font-family:'Barlow Condensed',sans-serif;font-size:11px;color:var(--muted)}
+input[type=range]{flex:1;accent-color:var(--gold);height:2px;cursor:pointer}
+.wpm-display{font-family:'Barlow Condensed',sans-serif;font-size:17px;color:var(--gold2);min-width:70px;text-align:right;letter-spacing:0.5px}
+
+.voice-spec{display:grid;grid-template-columns:repeat(3,1fr);gap:1px;background:var(--border);margin:0 18px 18px}
+.spec-item{background:var(--surface2);padding:12px 14px;text-align:center}
+.spec-sym{font-size:20px;margin-bottom:5px;color:var(--gold);opacity:0.7}
+.spec-name{font-family:'Barlow Condensed',sans-serif;font-size:9px;letter-spacing:2px;text-transform:uppercase;color:var(--muted);margin-bottom:3px}
+.spec-val{font-size:13px;color:var(--gold2);font-family:'Barlow Condensed',sans-serif;letter-spacing:0.5px}
+
+.action-bar{padding:18px;display:flex;gap:12px;align-items:center}
+.btn-convert{flex:1;background:var(--gold);color:#000;border:none;padding:13px 28px;font-family:'Barlow Condensed',sans-serif;font-size:13px;letter-spacing:3px;text-transform:uppercase;font-weight:600;cursor:pointer;transition:all 0.2s;border-radius:1px}
+.btn-convert:hover:not(:disabled){background:var(--gold2);transform:translateY(-1px)}
+.btn-convert:disabled{opacity:0.4;cursor:not-allowed}
+.btn-preview{background:transparent;border:0.5px solid var(--border);color:var(--muted);padding:13px 18px;font-family:'Barlow Condensed',sans-serif;font-size:11px;letter-spacing:2px;text-transform:uppercase;cursor:pointer;transition:all 0.2s;border-radius:1px;white-space:nowrap}
+.btn-preview:hover:not(:disabled){border-color:var(--gold);color:var(--gold)}
+.btn-preview.active{border-color:var(--gold);color:var(--gold)}
+.btn-preview:disabled{opacity:0.4;cursor:not-allowed}
+
+.progress-bar{height:2px;background:var(--border);margin:0 18px 16px;border-radius:1px;overflow:hidden;display:none}
+.progress-fill{height:100%;background:linear-gradient(90deg,var(--gold),var(--gold2));width:0%;transition:width 0.4s;border-radius:1px}
+
+.status-line{padding:10px 18px;font-family:'Barlow Condensed',sans-serif;font-size:11px;letter-spacing:1.5px;color:var(--muted);display:none;align-items:center;gap:8px;text-transform:uppercase}
+.dot{width:6px;height:6px;border-radius:50%;background:var(--gold);animation:pulse 1s ease-in-out infinite;flex-shrink:0}
+@keyframes pulse{0%,100%{opacity:0.2}50%{opacity:1}}
+
+.result-panel{display:none}
+.audio-player{padding:18px;display:flex;flex-direction:column;gap:12px}
+.waveform{height:52px;display:flex;align-items:center;gap:2px;padding:0 4px;overflow:hidden}
+.wave-bar{flex:1;background:var(--gold);border-radius:1px;min-width:2px;transition:opacity 0.1s}
+.player-controls{display:flex;align-items:center;gap:14px}
+.play-btn{width:38px;height:38px;border-radius:50%;border:1px solid var(--gold);background:transparent;color:var(--gold);cursor:pointer;display:flex;align-items:center;justify-content:center;transition:all 0.2s;flex-shrink:0}
+.play-btn:hover{background:var(--gold);color:#000}
+.time-info{font-family:'Barlow Condensed',sans-serif;font-size:12px;color:var(--muted);flex:1;letter-spacing:1px}
+audio{width:100%;margin-top:4px;filter:invert(1) hue-rotate(180deg);opacity:0.7;border-radius:2px}
+.btn-download{background:transparent;border:0.5px solid var(--gold);color:var(--gold);padding:9px 18px;font-family:'Barlow Condensed',sans-serif;font-size:11px;letter-spacing:2px;text-transform:uppercase;cursor:pointer;transition:all 0.2s;border-radius:1px;text-decoration:none;display:inline-block;white-space:nowrap}
+.btn-download:hover{background:var(--gold);color:#000}
+.btn-stop{background:transparent;border:0.5px solid #5a2020;color:#c87070;padding:9px 14px;font-family:'Barlow Condensed',sans-serif;font-size:11px;letter-spacing:2px;text-transform:uppercase;cursor:pointer;transition:all 0.2s;border-radius:1px;white-space:nowrap}
+.btn-stop:hover{background:#5a2020}
+
+.meta-bar{display:flex;gap:0;padding:0;border-top:0.5px solid var(--border)}
+.meta-item{font-family:'Barlow Condensed',sans-serif;font-size:11px;letter-spacing:1px;color:var(--muted);flex:1;padding:10px 18px;border-right:0.5px solid var(--border);text-transform:uppercase}
+.meta-item:last-child{border-right:none}
+.meta-item span{color:var(--gold2);display:block;font-size:14px;margin-top:2px}
+
+.no-support{background:#1a0d0d;border:0.5px solid #5a2020;color:#c87070;padding:12px 18px;margin:0 18px 14px;font-family:'Barlow Condensed',sans-serif;font-size:12px;letter-spacing:0.5px;border-radius:2px;display:none}
+
+.file-loaded{background:#0d1a0d;border:0.5px solid #2d5a1b;color:#7ecf4a;padding:10px 18px;margin:0 18px 14px;font-family:'Barlow Condensed',sans-serif;font-size:11px;letter-spacing:1px;border-radius:2px;display:none;text-transform:uppercase}
+
+.footer{text-align:center;padding:2.5rem 1rem;border-top:0.5px solid var(--border);margin-top:0.5rem}
+.footer p{font-size:11px;color:var(--muted);font-family:'Barlow Condensed',sans-serif;letter-spacing:2px;text-transform:uppercase}
+.footer p + p{margin-top:6px;opacity:0.5}
+
+@media(max-width:600px){
+  .config-grid{grid-template-columns:1fr}
+  .config-cell.full{grid-column:1}
+  .voice-spec{grid-template-columns:repeat(3,1fr)}
+  .action-bar{flex-direction:column}
+  .btn-preview,.btn-convert{width:100%}
+  .meta-bar{flex-direction:column}
+  .meta-item{border-right:none;border-bottom:0.5px solid var(--border)}
+  .meta-item:last-child{border-bottom:none}
+}
+</style>
+</head>
+<body>
+
+<div class="letterhead">
+  <div class="seal">
+    <svg viewBox="0 0 24 24" fill="none" stroke="#c9a84c" stroke-width="1.5">
+      <path d="M12 2l2.4 7.4H22l-6.2 4.5 2.4 7.4L12 17l-6.2 4.3 2.4-7.4L2 9.4h7.6z"/>
+    </svg>
+  </div>
+  <h1>Lex Vox</h1>
+  <div class="subtitle">Sistema de Síntesis de Voz Jurídica &bull; Voz Masculina Grave</div>
+  <div class="ornament">— § —</div>
+</div>
+
+<div class="main">
+
+  <!-- Panel 1: Entrada de documento -->
+  <div class="panel">
+    <div class="panel-header">
+      <div class="panel-label">Documento de Entrada</div>
+      <div class="badge">PDF · DOCX · TXT · PNG · JPG</div>
+    </div>
+    <div class="no-support" id="noSupport">
+      Su navegador no soporta síntesis de voz. Utilice Google Chrome, Microsoft Edge o Safari actualizado.
+    </div>
+    <div class="file-loaded" id="fileLoaded"></div>
+    <div class="drop-zone" id="dropZone">
+      <input type="file" id="fileInput" accept=".txt,.pdf,.docx,.doc,.png,.jpg,.jpeg,.bmp,.gif,.webp" multiple>
+      <svg class="drop-icon" viewBox="0 0 32 32" fill="none" stroke="#7a7870" stroke-width="1.5">
+        <rect x="4" y="2" width="18" height="24" rx="2"/>
+        <path d="M18 2v8h8M10 14h12M10 18h8"/>
+        <path d="M22 22l4 4m-4 0l4-4" stroke-dasharray="none"/>
+      </svg>
+      <div class="drop-title">Arrastre su documento aquí</div>
+      <div class="drop-sub">o haga clic para seleccionar archivo</div>
+      <div class="formats">
+        <span class="fmt">PDF</span>
+        <span class="fmt">Word .docx</span>
+        <span class="fmt">TXT</span>
+        <span class="fmt">PNG</span>
+        <span class="fmt">JPG</span>
+      </div>
+    </div>
+    <div class="divider">o ingrese texto directamente</div>
+    <textarea id="textInput" rows="6"
+      placeholder="Ingrese o pegue el texto que desea convertir a voz... El sistema generará audio con voz masculina grave en tono legal profesional a 130 palabras por minuto."></textarea>
+  </div>
+
+  <!-- Panel 2: Parámetros de voz -->
+  <div class="panel">
+    <div class="panel-header">
+      <div class="panel-label">Parámetros de Voz</div>
+    </div>
+    <div class="voice-spec">
+      <div class="spec-item">
+        <div class="spec-sym">&#9794;</div>
+        <div class="spec-name">Género</div>
+        <div class="spec-val">Masculino</div>
+      </div>
+      <div class="spec-item">
+        <div class="spec-sym">&#9670;</div>
+        <div class="spec-name">Tono</div>
+        <div class="spec-val">Grave / Legal</div>
+      </div>
+      <div class="spec-item">
+        <div class="spec-sym">&#9835;</div>
+        <div class="spec-name">Formato</div>
+        <div class="spec-val">MP3 / WebM</div>
+      </div>
+    </div>
+    <div class="config-grid">
+      <div class="config-cell full">
+        <div class="cfg-label">Velocidad — Palabras por Minuto</div>
+        <div class="slider-wrap">
+          <span class="slider-limit">80</span>
+          <input type="range" id="rateSlider" min="0.5" max="1.5" step="0.05" value="0.85">
+          <span class="slider-limit">200</span>
+          <div class="wpm-display" id="wpmDisplay">~130 wpm</div>
+        </div>
+      </div>
+      <div class="config-cell">
+        <div class="cfg-label">Selección de Voz</div>
+        <select id="voiceSelect">
+          <option>Cargando voces...</option>
+        </select>
+      </div>
+      <div class="config-cell">
+        <div class="cfg-label">Tono Base (Pitch)</div>
+        <select id="pitchSelect">
+          <option value="0.6">Muy Grave — Autoridad Máxima</option>
+          <option value="0.75" selected>Grave Legal — Recomendado</option>
+          <option value="0.9">Moderado</option>
+          <option value="1.0">Natural</option>
+        </select>
+      </div>
+    </div>
+  </div>
+
+  <!-- Panel 3: Acciones -->
+  <div class="panel">
+    <div class="panel-header">
+      <div class="panel-label">Generar Audio</div>
+    </div>
+    <div class="status-line" id="statusLine">
+      <div class="dot"></div>
+      <span id="statusText">Procesando...</span>
+    </div>
+    <div class="progress-bar" id="progressBar">
+      <div class="progress-fill" id="progressFill"></div>
+    </div>
+    <div class="action-bar">
+      <button class="btn-preview" id="btnPreview" onclick="previewVoice()">&#9654; Vista Previa</button>
+      <button class="btn-convert" id="btnConvert" onclick="convertToAudio()">Generar Audio MP3</button>
+    </div>
+  </div>
+
+  <!-- Panel 4: Resultado -->
+  <div class="panel result-panel" id="resultPanel">
+    <div class="panel-header">
+      <div class="panel-label">Audio Generado</div>
+      <div class="badge badge-green" id="resultBadge">Listo</div>
+    </div>
+    <div class="audio-player">
+      <div class="waveform" id="waveform"></div>
+      <audio id="audioPlayer" controls onended="audioEnded()" ontimeupdate="updateTime()"></audio>
+      <div class="player-controls">
+        <div class="time-info" id="timeInfo">Duración estimada calculada</div>
+        <button class="btn-stop" id="btnStop" onclick="stopAll()" style="display:none">&#9632; Detener</button>
+        <a class="btn-download" id="downloadBtn" href="#" download="lex-vox.mp3">&#8595; Descargar</a>
+      </div>
+    </div>
+    <div class="meta-bar">
+      <div class="meta-item">Palabras<span id="metaWords">—</span></div>
+      <div class="meta-item">Duración Est.<span id="metaDuration">—</span></div>
+      <div class="meta-item">Velocidad<span id="metaWpm">—</span></div>
+      <div class="meta-item">Voz<span id="metaVoice">—</span></div>
+    </div>
+  </div>
+
+</div>
+
+<div class="footer">
+  <p>Lex Vox &bull; Sistema de Síntesis de Voz Jurídica</p>
+  <p>Voz masculina grave &bull; 130 palabras por minuto &bull; Formato MP3</p>
+</div>
+
+<script>
+const synth = window.speechSynthesis;
+let voices = [];
+let selectedVoice = null;
+let mediaRecorder = null;
+let chunks = [];
+let recordedBlob = null;
+let isRecording = false;
+let previewUtterance = null;
+
+// ─── Soporte ───────────────────────────────────────────────
+function checkSupport() {
+  if (!synth) {
+    document.getElementById('noSupport').style.display = 'block';
+    document.getElementById('btnConvert').disabled = true;
+    document.getElementById('btnPreview').disabled = true;
+  }
+}
+
+// ─── Voces ─────────────────────────────────────────────────
+function loadVoices() {
+  voices = synth.getVoices();
+  if (!voices.length) return;
+
+  const sel = document.getElementById('voiceSelect');
+  sel.innerHTML = '';
+
+  const maleKeys = ['male','man','david','jorge','diego','carlos','miguel','pablo','antonio','juan','pedro','george','richard','robert','thomas','william','james','mark','alex','daniel','microsoft pablo','microsoft jorge','google español'];
+  const esLangs  = ['es-', 'es_'];
+
+  // Categorizar
+  const esMale  = voices.filter(v => esLangs.some(l => v.lang.toLowerCase().startsWith(l)) && maleKeys.some(k => v.name.toLowerCase().includes(k)));
+  const esAny   = voices.filter(v => esLangs.some(l => v.lang.toLowerCase().startsWith(l)));
+  const maleAny = voices.filter(v => maleKeys.some(k => v.name.toLowerCase().includes(k)));
+
+  const ranked = [...new Set([...esMale, ...esAny, ...maleAny, ...voices])];
+
+  ranked.forEach((v) => {
+    const opt = document.createElement('option');
+    opt.value = voices.indexOf(v);
+    const lang = v.lang ? ` [${v.lang}]` : '';
+    opt.textContent = v.name + lang;
+    sel.appendChild(opt);
+  });
+
+  // Pre-seleccionar mejor opción
+  const best = esMale[0] || esAny[0] || maleAny[0] || voices[0];
+  if (best) sel.value = voices.indexOf(best);
+
+  updateSelectedVoice();
+}
+
+function updateSelectedVoice() {
+  const sel = document.getElementById('voiceSelect');
+  const idx = parseInt(sel.value);
+  selectedVoice = voices[idx] || null;
+  if (selectedVoice) document.getElementById('metaVoice').textContent = selectedVoice.name.split(' ').slice(0,3).join(' ');
+}
+
+document.getElementById('voiceSelect').addEventListener('change', updateSelectedVoice);
+
+if (synth) {
+  synth.onvoiceschanged = loadVoices;
+  setTimeout(loadVoices, 300);
+  setTimeout(loadVoices, 800);
+}
+
+// ─── Slider velocidad ───────────────────────────────────────
+document.getElementById('rateSlider').addEventListener('input', function() {
+  const wpm = Math.round(parseFloat(this.value) * 150);
+  document.getElementById('wpmDisplay').textContent = '~' + wpm + ' wpm';
+  updateMeta();
+});
+
+// ─── Lectura de archivos ────────────────────────────────────
+async function readFile(file) {
+  const ext = file.name.split('.').pop().toLowerCase();
+
+  if (['txt','csv','md','js','py','html','xml','json'].includes(ext)) {
+    return new Promise((res, rej) => {
+      const r = new FileReader();
+      r.onload = e => res(e.target.result);
+      r.onerror = rej;
+      r.readAsText(file, 'UTF-8');
+    });
+  }
+
+  if (['png','jpg','jpeg','gif','bmp','webp'].includes(ext)) {
+    return `[IMAGEN: ${file.name}]\n\nNota: Para procesar texto de imágenes se requiere OCR. Por favor copie el texto de la imagen y péguelo en el campo de texto, o use un servicio OCR externo como Google Lens.`;
+  }
+
+  if (['pdf','docx','doc','pptx','xlsx'].includes(ext)) {
+    return `[DOCUMENTO: ${file.name}]\n\nNota: La lectura directa de ${ext.toUpperCase()} requiere un servidor backend. Por favor:\n1. Abra el documento\n2. Seleccione todo el texto (Ctrl+A)\n3. Cópielo (Ctrl+C)\n4. Péguelo en el campo de texto de esta aplicación.`;
+  }
+
+  return new Promise((res, rej) => {
+    const r = new FileReader();
+    r.onload = e => res(e.target.result);
+    r.onerror = rej;
+    r.readAsText(file, 'UTF-8');
+  });
+}
+
+document.getElementById('fileInput').addEventListener('change', async function(e) {
+  const files = Array.from(e.target.files);
+  if (!files.length) return;
+
+  showStatus('Leyendo archivo...');
+  let allText = '';
+
+  for (const file of files) {
+    try {
+      const txt = await readFile(file);
+      allText += txt + '\n\n';
+    } catch (err) {
+      allText += `[Error leyendo ${file.name}]\n\n`;
+    }
+  }
+
+  const textArea = document.getElementById('textInput');
+  textArea.value = allText.trim();
+
+  const fl = document.getElementById('fileLoaded');
+  fl.textContent = 'Archivo cargado: ' + files.map(f => f.name).join(', ');
+  fl.style.display = 'block';
+
+  updateMeta();
+  hideStatus();
+});
+
+// Drag & Drop
+const dropZone = document.getElementById('dropZone');
+dropZone.addEventListener('dragover', e => { e.preventDefault(); dropZone.classList.add('drag-over'); });
+dropZone.addEventListener('dragleave', () => dropZone.classList.remove('drag-over'));
+dropZone.addEventListener('drop', async e => {
+  e.preventDefault();
+  dropZone.classList.remove('drag-over');
+  const files = Array.from(e.dataTransfer.files);
+  if (!files.length) return;
+  // Crear FileList simulada
+  const dt = new DataTransfer();
+  files.forEach(f => dt.items.add(f));
+  document.getElementById('fileInput').files = dt.files;
+  document.getElementById('fileInput').dispatchEvent(new Event('change'));
+});
+
+document.getElementById('textInput').addEventListener('input', updateMeta);
+
+// ─── Meta información ───────────────────────────────────────
+function updateMeta() {
+  const text = document.getElementById('textInput').value.trim();
+  const words = text ? text.trim().split(/\s+/).filter(w => w.length > 0).length : 0;
+  const rate = parseFloat(document.getElementById('rateSlider').value);
+  const wpm = Math.round(rate * 150);
+  const totalSecs = words > 0 ? Math.round((words / wpm) * 60) : 0;
+  const mm = Math.floor(totalSecs / 60);
+  const ss = totalSecs % 60;
+
+  document.getElementById('metaWords').textContent = words > 0 ? words.toLocaleString() : '—';
+  document.getElementById('metaDuration').textContent = words > 0 ? mm + ':' + ss.toString().padStart(2,'0') : '—';
+  document.getElementById('metaWpm').textContent = wpm + ' wpm';
+}
+
+// ─── Estado visual ──────────────────────────────────────────
+function showStatus(msg) {
+  const sl = document.getElementById('statusLine');
+  document.getElementById('statusText').textContent = msg;
+  sl.style.display = 'flex';
+}
+function hideStatus() {
+  document.getElementById('statusLine').style.display = 'none';
+}
+function setProgress(pct) {
+  const pb = document.getElementById('progressBar');
+  pb.style.display = 'block';
+  document.getElementById('progressFill').style.width = pct + '%';
+  if (pct >= 100) setTimeout(() => { pb.style.display = 'none'; }, 600);
+}
+
+// ─── Vista previa ───────────────────────────────────────────
+function previewVoice() {
+  if (!synth) return;
+  const btn = document.getElementById('btnPreview');
+
+  if (synth.speaking) {
+    synth.cancel();
+    btn.classList.remove('active');
+    btn.textContent = '▶ Vista Previa';
+    return;
+  }
+
+  const text = document.getElementById('textInput').value.trim()
+    || 'El sistema de voz jurídica Lex Vox está operativo. Voz masculina grave, tono legal profesional, listo para procesar su documento.';
+  const preview = text.substring(0, 200) + (text.length > 200 ? '...' : '');
+
+  const utt = new SpeechSynthesisUtterance(preview);
+  utt.voice = selectedVoice;
+  utt.rate = parseFloat(document.getElementById('rateSlider').value);
+  utt.pitch = parseFloat(document.getElementById('pitchSelect').value);
+  utt.volume = 1;
+  utt.lang = selectedVoice ? selectedVoice.lang : 'es-ES';
+
+  btn.classList.add('active');
+  btn.textContent = '■ Detener';
+
+  utt.onend = utt.onerror = () => {
+    btn.classList.remove('active');
+    btn.textContent = '▶ Vista Previa';
+  };
+
+  synth.speak(utt);
+}
+
+// ─── Generar audio ──────────────────────────────────────────
+async function convertToAudio() {
+  const text = document.getElementById('textInput').value.trim();
+  if (!text) { alert('Por favor ingrese texto o cargue un documento primero.'); return; }
+  if (!synth) return;
+
+  synth.cancel();
+  const btn = document.getElementById('btnConvert');
+  btn.disabled = true;
+  btn.textContent = 'Generando...';
+
+  setProgress(10);
+  showStatus('Iniciando síntesis de voz...');
+
+  // Intentar grabación con MediaRecorder
+  const canRecord = !!(window.MediaRecorder && navigator.mediaDevices && navigator.mediaDevices.getUserMedia);
+
+  if (canRecord) {
+    try {
+      await recordWithMediaRecorder(text, btn);
+      return;
+    } catch (e) {
+      console.warn('MediaRecorder falló, usando modo directo:', e);
+    }
+  }
+
+  // Fallback: reproducción directa
+  directPlayback(text, btn);
+}
+
+async function recordWithMediaRecorder(text, btn) {
+  // Usar AudioContext para capturar síntesis
+  const stream = await navigator.mediaDevices.getUserMedia({ audio: true });
+
+  chunks = [];
+  const mimeType = MediaRecorder.isTypeSupported('audio/webm;codecs=opus')
+    ? 'audio/webm;codecs=opus'
+    : MediaRecorder.isTypeSupported('audio/webm') ? 'audio/webm' : 'audio/ogg';
+
+  mediaRecorder = new MediaRecorder(stream, { mimeType });
+  mediaRecorder.ondataavailable = e => { if (e.data && e.data.size > 0) chunks.push(e.data); };
+
+  mediaRecorder.onstop = () => {
+    stream.getTracks().forEach(t => t.stop());
+    const blob = new Blob(chunks, { type: mimeType });
+    recordedBlob = blob;
+
+    const url = URL.createObjectURL(blob);
+    const audio = document.getElementById('audioPlayer');
+    audio.src = url;
+
+    const dlBtn = document.getElementById('downloadBtn');
+    dlBtn.href = url;
+    const ext = mimeType.includes('webm') ? 'webm' : 'ogg';
+    dlBtn.download = 'lex-vox-audio.' + ext;
+    dlBtn.textContent = '↓ Descargar';
+    dlBtn.onclick = null;
+
+    showResultPanel(text);
+    btn.disabled = false;
+    btn.textContent = 'Generar Audio MP3';
+    setProgress(100);
+    hideStatus();
+    document.getElementById('btnStop').style.display = 'none';
+    isRecording = false;
+  };
+
+  mediaRecorder.start(100);
+  isRecording = true;
+  document.getElementById('btnStop').style.display = 'inline-block';
+
+  setProgress(30);
+  showStatus('Grabando síntesis de voz...');
+
+  const utt = new SpeechSynthesisUtterance(text);
+  utt.voice = selectedVoice;
+  utt.rate = parseFloat(document.getElementById('rateSlider').value);
+  utt.pitch = parseFloat(document.getElementById('pitchSelect').value);
+  utt.volume = 1;
+  utt.lang = selectedVoice ? selectedVoice.lang : 'es-ES';
+
+  utt.onstart = () => { setProgress(50); showStatus('Sintetizando voz — por favor espere...'); };
+  utt.onend = () => {
+    setProgress(85);
+    showStatus('Finalizando audio...');
+    setTimeout(() => { if (mediaRecorder && mediaRecorder.state !== 'inactive') mediaRecorder.stop(); }, 600);
+  };
+  utt.onerror = (e) => {
+    if (mediaRecorder && mediaRecorder.state !== 'inactive') mediaRecorder.stop();
+    console.error('SpeechSynthesis error:', e);
+    directPlayback(text, btn);
+  };
+
+  synth.speak(utt);
+}
+
+function directPlayback(text, btn) {
+  showStatus('Reproduciendo síntesis de voz...');
+  setProgress(60);
+
+  const utt = new SpeechSynthesisUtterance(text);
+  utt.voice = selectedVoice;
+  utt.rate = parseFloat(document.getElementById('rateSlider').value);
+  utt.pitch = parseFloat(document.getElementById('pitchSelect').value);
+  utt.volume = 1;
+  utt.lang = selectedVoice ? selectedVoice.lang : 'es-ES';
+
+  document.getElementById('btnStop').style.display = 'inline-block';
+
+  utt.onstart = () => { setProgress(80); };
+  utt.onend = () => {
+    setProgress(100);
+    hideStatus();
+    btn.disabled = false;
+    btn.textContent = 'Generar Audio MP3';
+    document.getElementById('btnStop').style.display = 'none';
+
+    // Configurar descarga de la voz del sistema (no grabada)
+    const dlBtn = document.getElementById('downloadBtn');
+    dlBtn.href = '#';
+    dlBtn.removeAttribute('download');
+    dlBtn.textContent = '▶ Reproducir de nuevo';
+    dlBtn.onclick = (e) => {
+      e.preventDefault();
+      synth.cancel();
+      const u2 = new SpeechSynthesisUtterance(document.getElementById('textInput').value.trim());
+      u2.voice = selectedVoice;
+      u2.rate = parseFloat(document.getElementById('rateSlider').value);
+      u2.pitch = parseFloat(document.getElementById('pitchSelect').value);
+      u2.lang = selectedVoice ? selectedVoice.lang : 'es-ES';
+      synth.speak(u2);
+    };
+
+    showResultPanel(text);
+  };
+  utt.onerror = () => {
+    btn.disabled = false;
+    btn.textContent = 'Generar Audio MP3';
+    hideStatus();
+    document.getElementById('btnStop').style.display = 'none';
+    setProgress(0);
+    document.getElementById('progressBar').style.display = 'none';
+  };
+
+  synth.speak(utt);
+}
+
+function stopAll() {
+  synth.cancel();
+  if (mediaRecorder && mediaRecorder.state !== 'inactive') {
+    mediaRecorder.stop();
+  }
+  document.getElementById('btnStop').style.display = 'none';
+  document.getElementById('btnConvert').disabled = false;
+  document.getElementById('btnConvert').textContent = 'Generar Audio MP3';
+  hideStatus();
+  document.getElementById('progressBar').style.display = 'none';
+}
+
+// ─── Panel de resultado ─────────────────────────────────────
+function showResultPanel(text) {
+  const panel = document.getElementById('resultPanel');
+  panel.style.display = 'block';
+  buildWaveform();
+  updateMeta();
+  panel.scrollIntoView({ behavior: 'smooth', block: 'nearest' });
+}
+
+function buildWaveform() {
+  const wf = document.getElementById('waveform');
+  wf.innerHTML = '';
+  const bars = 80;
+  for (let i = 0; i < bars; i++) {
+    const b = document.createElement('div');
+    b.className = 'wave-bar';
+    const h = 6 + Math.random() * 38;
+    b.style.height = h + 'px';
+    b.style.opacity = (0.15 + Math.random() * 0.7).toFixed(2);
+    wf.appendChild(b);
+  }
+}
+
+function audioEnded() {
+  document.getElementById('btnStop').style.display = 'none';
+}
+
+function updateTime() {
+  const audio = document.getElementById('audioPlayer');
+  const cur = audio.currentTime || 0;
+  const dur = audio.duration || 0;
+  const fmt = s => Math.floor(s/60) + ':' + Math.floor(s%60).toString().padStart(2,'0');
+  document.getElementById('timeInfo').textContent = fmt(cur) + ' / ' + fmt(dur);
+}
+
+// ─── Init ───────────────────────────────────────────────────
+checkSupport();
+updateMeta();
+</script>
+</body>
+</html>
