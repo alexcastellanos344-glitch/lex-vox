@@ -1,0 +1,451 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Lex Vox</title>
+</head>
+<body style="margin:0;padding:0;background:#0a0a0c;color:#ece9e0;font-family:Georgia,serif;">
+
+<!-- HEADER -->
+<div style="background:#050507;border-bottom:3px solid #c9a84c;padding:30px 20px;text-align:center;">
+  <h1 style="font-family:Arial,sans-serif;font-size:32px;font-weight:900;letter-spacing:8px;color:#e8c96e;margin:0 0 8px 0;text-transform:uppercase;">Lex Vox</h1>
+  <p style="font-family:Arial,sans-serif;font-size:12px;color:#6a6860;letter-spacing:3px;margin:0;text-transform:uppercase;">Sistema de Sintesis de Voz Juridica &bull; Voz Masculina Grave</p>
+</div>
+
+<!-- BANNER -->
+<div style="background:#0a1c0a;border-bottom:1px solid #3a8a1a;padding:9px 20px;text-align:center;font-family:Arial,sans-serif;font-size:11px;letter-spacing:2px;color:#6abf3a;text-transform:uppercase;">
+  Voz masculina grave fija &bull; 130 palabras por minuto &bull; Perfil juridico legal &bull; 100% Gratuito
+</div>
+
+<div style="max-width:800px;margin:0 auto;padding:20px 16px 40px;">
+
+  <!-- ESTADO DE VOZ -->
+  <div id="vozStatus" style="background:#1a140a;border:1px solid #5a3a0a;border-radius:4px;padding:10px 16px;margin-bottom:16px;font-family:Arial,sans-serif;font-size:12px;color:#c8a060;letter-spacing:1px;text-align:center;text-transform:uppercase;">
+    Cargando motor de voz masculina grave...
+  </div>
+
+  <!-- PANEL ENTRADA -->
+  <div style="background:#111115;border:1px solid #2a2a35;border-radius:4px;margin-bottom:16px;">
+    <div style="background:#16161c;border-bottom:1px solid #2a2a35;padding:10px 18px;display:flex;align-items:center;justify-content:space-between;">
+      <span style="font-family:Arial,sans-serif;font-size:10px;letter-spacing:2px;color:#6a6860;text-transform:uppercase;">Texto a Convertir</span>
+      <span style="background:#c9a84c;color:#000;font-family:Arial,sans-serif;font-size:9px;font-weight:700;padding:2px 8px;letter-spacing:1px;text-transform:uppercase;">TXT &middot; PDF &middot; DOCX &middot; PNG</span>
+    </div>
+
+    <!-- DROP ZONE -->
+    <div id="dropzone" style="border:1px dashed #2e2e3c;margin:18px 18px 0;padding:24px 20px;text-align:center;cursor:pointer;border-radius:4px;position:relative;">
+      <input type="file" id="fileIn" accept=".txt,.pdf,.docx,.doc,.png,.jpg,.jpeg,.bmp,.webp" multiple style="position:absolute;top:0;left:0;width:100%;height:100%;opacity:0;cursor:pointer;">
+      <div style="font-size:28px;margin-bottom:8px;">&#128196;</div>
+      <div style="font-size:15px;color:#ece9e0;margin-bottom:4px;">Arrastre su documento aqui o haga clic</div>
+      <div style="font-family:Arial,sans-serif;font-size:11px;color:#6a6860;">TXT &bull; PDF &bull; Word .docx &bull; PNG &bull; JPG</div>
+    </div>
+
+    <div style="display:flex;align-items:center;gap:10px;padding:12px 18px 6px;color:#6a6860;font-size:11px;font-family:Arial,sans-serif;letter-spacing:2px;text-transform:uppercase;">
+      <div style="flex:1;height:1px;background:#2a2a35;"></div>o escriba directamente<div style="flex:1;height:1px;background:#2a2a35;"></div>
+    </div>
+
+    <textarea id="txt" rows="7" style="display:block;width:calc(100% - 36px);margin:0 18px;background:#18181e;border:1px solid #2a2a35;border-radius:4px;color:#ece9e0;font-family:Georgia,serif;font-size:15px;line-height:1.8;padding:14px;resize:vertical;outline:none;box-sizing:border-box;" placeholder="Ingrese o pegue el texto juridico aqui..."></textarea>
+
+    <div style="display:flex;background:#2a2a35;gap:1px;margin-top:1px;">
+      <div style="background:#16161c;padding:8px 12px;font-family:Arial,sans-serif;font-size:9px;color:#6a6860;text-transform:uppercase;flex:1;letter-spacing:1px;">Palabras<br><b id="sw" style="color:#e8c96e;font-size:13px;font-weight:400;">0</b></div>
+      <div style="background:#16161c;padding:8px 12px;font-family:Arial,sans-serif;font-size:9px;color:#6a6860;text-transform:uppercase;flex:1;letter-spacing:1px;">Caracteres<br><b id="sc" style="color:#e8c96e;font-size:13px;font-weight:400;">0</b></div>
+      <div style="background:#16161c;padding:8px 12px;font-family:Arial,sans-serif;font-size:9px;color:#6a6860;text-transform:uppercase;flex:1;letter-spacing:1px;">Paginas<br><b id="sp" style="color:#e8c96e;font-size:13px;font-weight:400;">0</b></div>
+      <div style="background:#16161c;padding:8px 12px;font-family:Arial,sans-serif;font-size:9px;color:#6a6860;text-transform:uppercase;flex:1;letter-spacing:1px;">Duracion<br><b id="sd" style="color:#e8c96e;font-size:13px;font-weight:400;">--</b></div>
+    </div>
+  </div>
+
+  <!-- PANEL ACCION -->
+  <div style="background:#111115;border:1px solid #2a2a35;border-radius:4px;margin-bottom:16px;">
+    <div style="background:#16161c;border-bottom:1px solid #2a2a35;padding:10px 18px;">
+      <span style="font-family:Arial,sans-serif;font-size:10px;letter-spacing:2px;color:#6a6860;text-transform:uppercase;">Generar Audio &mdash; Voz Masculina Grave Legal</span>
+    </div>
+
+    <div id="msg" style="display:none;margin:14px 18px 0;padding:10px 14px;border-radius:4px;font-family:Arial,sans-serif;font-size:12px;line-height:1.5;"></div>
+
+    <div id="progwrap" style="display:none;padding:14px 18px 0;">
+      <div style="display:flex;justify-content:space-between;margin-bottom:6px;">
+        <span id="progLbl" style="font-family:Arial,sans-serif;font-size:10px;color:#6a6860;text-transform:uppercase;letter-spacing:1px;">Procesando...</span>
+        <span id="progPct" style="font-family:Arial,sans-serif;font-size:10px;color:#e8c96e;">0%</span>
+      </div>
+      <div style="height:3px;background:#2a2a35;border-radius:2px;overflow:hidden;">
+        <div id="progfill" style="height:100%;background:#c9a84c;width:0%;transition:width 0.4s;"></div>
+      </div>
+    </div>
+
+    <div style="padding:16px 18px;display:flex;gap:10px;flex-wrap:wrap;">
+      <button onclick="doPrev()" id="btnP" style="background:transparent;border:1px solid #2e2e3c;color:#8a8780;padding:13px 18px;font-family:Arial,sans-serif;font-size:11px;letter-spacing:2px;text-transform:uppercase;cursor:pointer;border-radius:4px;white-space:nowrap;">&#9654; Vista Previa</button>
+      <button onclick="doStop()" id="btnS" style="display:none;background:transparent;border:1px solid #5a1a1a;color:#c06060;padding:13px 16px;font-family:Arial,sans-serif;font-size:11px;letter-spacing:2px;text-transform:uppercase;cursor:pointer;border-radius:4px;white-space:nowrap;">&#9632; Detener</button>
+      <button onclick="doGen()" id="btnG" style="flex:1;min-width:180px;background:#c9a84c;color:#000;border:none;padding:13px;font-family:Arial,sans-serif;font-size:12px;letter-spacing:3px;text-transform:uppercase;font-weight:700;cursor:pointer;border-radius:4px;">&#9834; Generar Audio MP3</button>
+    </div>
+  </div>
+
+  <!-- PANEL RESULTADO -->
+  <div id="resbox" style="display:none;background:#111115;border:1px solid #2a2a35;border-radius:4px;margin-bottom:16px;">
+    <div style="background:#16161c;border-bottom:1px solid #2a2a35;padding:10px 18px;display:flex;justify-content:space-between;align-items:center;">
+      <span style="font-family:Arial,sans-serif;font-size:10px;letter-spacing:2px;color:#6a6860;text-transform:uppercase;">Audio Generado</span>
+      <span style="background:#0a1c0a;color:#6abf3a;border:1px solid #3a8a1a;font-family:Arial,sans-serif;font-size:9px;font-weight:700;padding:2px 8px;letter-spacing:1px;text-transform:uppercase;">&#10003; Listo</span>
+    </div>
+    <div id="wavebox" style="height:52px;display:flex;align-items:center;gap:2px;padding:16px 18px 0;overflow:hidden;"></div>
+    <audio id="player" controls style="width:calc(100% - 36px);margin:12px 18px 0;display:block;" ontimeupdate="updT()"></audio>
+    <div style="padding:12px 18px 16px;display:flex;align-items:center;gap:10px;">
+      <div id="tInfo" style="font-family:Arial,sans-serif;font-size:11px;color:#6a6860;flex:1;letter-spacing:1px;">--</div>
+      <a id="dlBtn" href="#" download="lex-vox-legal.webm" style="background:transparent;border:1px solid #c9a84c;color:#c9a84c;padding:9px 20px;font-family:Arial,sans-serif;font-size:10px;letter-spacing:2px;text-transform:uppercase;cursor:pointer;border-radius:4px;text-decoration:none;display:inline-block;">&#8595; Descargar Audio</a>
+    </div>
+    <div style="display:flex;background:#2a2a35;gap:1px;border-top:1px solid #2a2a35;">
+      <div style="background:#111115;padding:10px 14px;font-family:Arial,sans-serif;font-size:9px;color:#6a6860;text-transform:uppercase;flex:1;letter-spacing:1px;">Palabras<br><b id="mw" style="color:#e8c96e;font-size:12px;font-weight:400;">--</b></div>
+      <div style="background:#111115;padding:10px 14px;font-family:Arial,sans-serif;font-size:9px;color:#6a6860;text-transform:uppercase;flex:1;letter-spacing:1px;">Duracion<br><b id="md" style="color:#e8c96e;font-size:12px;font-weight:400;">--</b></div>
+      <div style="background:#111115;padding:10px 14px;font-family:Arial,sans-serif;font-size:9px;color:#6a6860;text-transform:uppercase;flex:1;letter-spacing:1px;">Velocidad<br><b style="color:#e8c96e;font-size:12px;font-weight:400;">130 wpm</b></div>
+      <div style="background:#111115;padding:10px 14px;font-family:Arial,sans-serif;font-size:9px;color:#6a6860;text-transform:uppercase;flex:1;letter-spacing:1px;">Perfil<br><b style="color:#e8c96e;font-size:12px;font-weight:400;">Legal Grave</b></div>
+    </div>
+  </div>
+
+</div>
+
+<div style="text-align:center;padding:24px 16px;border-top:1px solid #2a2a35;font-family:Arial,sans-serif;font-size:10px;color:#4a4840;letter-spacing:2px;text-transform:uppercase;">
+  Lex Vox &bull; Sintesis de Voz Juridica &bull; v5.0 &bull; Voz Masculina Grave Fija
+</div>
+
+<style>
+@keyframes blink{0%,100%{opacity:0.15}50%{opacity:1}}
+</style>
+
+<script>
+// ══════════════════════════════════════════════════════
+// LEX VOX v5.0 — VOZ MASCULINA GRAVE FIJA
+// Sin opciones. Voz configurada al maximo de gravedad.
+// Perfil: pitch=0.1 (minimo), rate=0.85 (130 wpm)
+// ══════════════════════════════════════════════════════
+
+var synth = window.speechSynthesis;
+var VOZ = null;       // voz seleccionada automaticamente
+var rec = null;
+var chunks = [];
+var wt = null;
+
+// ── CONFIGURACION FIJA DE VOZ GRAVE ──────────────────
+var CFG = {
+  pitch: 0.1,     // minimo absoluto = maximo grave
+  rate:  0.85,    // ~130 palabras por minuto
+  volume: 1.0,
+  lang: 'es'
+};
+
+// ── SELECCION AUTOMATICA DE VOZ MASCULINA ────────────
+function seleccionarVoz() {
+  var todas = synth.getVoices();
+  if (!todas.length) return;
+
+  var masculinas = ['jorge','diego','carlos','miguel','pablo','antonio','juan',
+    'pedro','andres','felipe','hector','raul','david','richard','robert',
+    'james','george','male','man','microsoft pablo','microsoft jorge',
+    'microsoft raul','google espanol'];
+
+  var candidatos = [];
+
+  todas.forEach(function(v) {
+    var n = v.name.toLowerCase();
+    var l = v.lang.toLowerCase();
+    var pts = 0;
+
+    // Prioridad maxima: espanol masculino
+    if (l.startsWith('es')) pts += 100;
+    for (var i = 0; i < masculinas.length; i++) {
+      if (n.indexOf(masculinas[i]) >= 0) { pts += 80; break; }
+    }
+    // Penalizar voces femeninas conocidas
+    if (n.indexOf('female') >= 0 || n.indexOf('woman') >= 0 ||
+        n.indexOf('helena') >= 0 || n.indexOf('sabina') >= 0 ||
+        n.indexOf('monica') >= 0 || n.indexOf('laura') >= 0 ||
+        n.indexOf('maria') >= 0 || n.indexOf('paula') >= 0 ||
+        n.indexOf('rosa') >= 0  || n.indexOf('elena') >= 0 ||
+        n.indexOf('isabel') >= 0 || n.indexOf('lucia') >= 0 ||
+        n.indexOf('carmen') >= 0 || n.indexOf('ana') >= 0) {
+      pts -= 200;
+    }
+    candidatos.push({ v: v, pts: pts });
+  });
+
+  candidatos.sort(function(a, b) { return b.pts - a.pts; });
+  VOZ = candidatos[0] ? candidatos[0].v : todas[0];
+
+  // Mostrar voz seleccionada
+  var st = document.getElementById('vozStatus');
+  if (VOZ) {
+    st.style.background = '#0a1c0a';
+    st.style.border = '1px solid #3a8a1a';
+    st.style.color = '#6abf3a';
+    st.textContent = 'Voz activa: ' + VOZ.name + ' — Tono grave maximo — 130 wpm';
+  }
+}
+
+if (synth) {
+  synth.onvoiceschanged = seleccionarVoz;
+  setTimeout(seleccionarVoz, 400);
+  setTimeout(seleccionarVoz, 1500);
+  setTimeout(seleccionarVoz, 3500);
+}
+
+// ── LECTURA DE ARCHIVOS ───────────────────────────────
+document.getElementById('fileIn').addEventListener('change', function(e) {
+  var files = Array.from(e.target.files);
+  if (!files.length) return;
+  showMsg('info', 'Leyendo archivo...');
+  var todo = '', done = 0;
+
+  files.forEach(function(file) {
+    var ext = file.name.split('.').pop().toLowerCase();
+    if (['txt','csv','md','json'].indexOf(ext) >= 0) {
+      var r = new FileReader();
+      r.onload = function(ev) {
+        todo += ev.target.result + '\n\n';
+        done++;
+        if (done === files.length) terminarLectura(todo, files);
+      };
+      r.readAsText(file, 'UTF-8');
+    } else {
+      todo += '[Archivo: ' + file.name + ']\nCopie el texto de este documento y peguelo en el campo de texto.\n\n';
+      done++;
+      if (done === files.length) terminarLectura(todo, files);
+    }
+  });
+});
+
+function terminarLectura(texto, files) {
+  if (texto.trim()) {
+    document.getElementById('txt').value = texto.trim();
+    showMsg('ok', 'Archivo cargado: ' + files.map(function(f){return f.name;}).join(', '));
+    actualizarStats();
+  }
+}
+
+// Drag and Drop
+var dz = document.getElementById('dropzone');
+dz.addEventListener('dragover', function(e) { e.preventDefault(); dz.style.borderColor = '#c9a84c'; });
+dz.addEventListener('dragleave', function() { dz.style.borderColor = '#2e2e3c'; });
+dz.addEventListener('drop', function(e) {
+  e.preventDefault(); dz.style.borderColor = '#2e2e3c';
+  var dt = new DataTransfer();
+  Array.from(e.dataTransfer.files).forEach(function(f) { dt.items.add(f); });
+  document.getElementById('fileIn').files = dt.files;
+  document.getElementById('fileIn').dispatchEvent(new Event('change'));
+});
+
+document.getElementById('txt').addEventListener('input', actualizarStats);
+
+// ── ESTADISTICAS ──────────────────────────────────────
+function actualizarStats() {
+  var t = document.getElementById('txt').value.trim();
+  var w = t ? t.split(/\s+/).filter(function(x){ return x; }).length : 0;
+  var c = document.getElementById('txt').value.length;
+  var p = Math.ceil(w / 250) || 0;
+  var s = w > 0 ? Math.round((w / 130) * 60) : 0;
+  var dur = s > 0 ? Math.floor(s/60) + ':' + (s%60 < 10 ? '0' : '') + (s%60) : '--';
+  document.getElementById('sw').textContent = w.toLocaleString();
+  document.getElementById('sc').textContent = c.toLocaleString();
+  document.getElementById('sp').textContent = p;
+  document.getElementById('sd').textContent = dur;
+  document.getElementById('mw').textContent = w > 0 ? w.toLocaleString() : '--';
+  document.getElementById('md').textContent = dur;
+}
+
+// ── UI HELPERS ────────────────────────────────────────
+function showMsg(tipo, txt) {
+  var el = document.getElementById('msg');
+  var estilos = {
+    ok:   'background:#0a1c0a;border:1px solid #3a8a1a;color:#6abf3a;',
+    warn: 'background:#1a140a;border:1px solid #5a3a0a;color:#c8a060;',
+    err:  'background:#1c0a0a;border:1px solid #8a1a1a;color:#c06060;',
+    info: 'background:#0a1222;border:1px solid #3a6a9a;color:#6a9fcf;'
+  };
+  el.style.cssText = 'display:block;margin:14px 18px 0;padding:10px 14px;border-radius:4px;font-family:Arial,sans-serif;font-size:12px;line-height:1.5;' + estilos[tipo];
+  el.textContent = txt;
+}
+function hideMsg() { document.getElementById('msg').style.display = 'none'; }
+
+function setProg(pct, lbl) {
+  document.getElementById('progwrap').style.display = 'block';
+  document.getElementById('progfill').style.width = pct + '%';
+  document.getElementById('progPct').textContent = Math.round(pct) + '%';
+  if (lbl) document.getElementById('progLbl').textContent = lbl;
+}
+function hideProg() { document.getElementById('progwrap').style.display = 'none'; }
+
+// ── CONSTRUIR UTTERANCE CON VOZ GRAVE FIJA ────────────
+function crearUtterance(texto) {
+  var u = new SpeechSynthesisUtterance(texto);
+  u.voice  = VOZ;
+  u.pitch  = CFG.pitch;   // 0.1 = maximo grave posible
+  u.rate   = CFG.rate;    // 0.85 = ~130 wpm
+  u.volume = CFG.volume;
+  u.lang   = VOZ ? VOZ.lang : CFG.lang;
+  return u;
+}
+
+// ── VISTA PREVIA ──────────────────────────────────────
+function doPrev() {
+  if (!synth) return;
+  var btn = document.getElementById('btnP');
+  if (synth.speaking) {
+    synth.cancel();
+    btn.textContent = '&#9654; Vista Previa';
+    btn.style.color = '#8a8780';
+    return;
+  }
+  var texto = document.getElementById('txt').value.trim() ||
+    'Por medio del presente aviso, el sistema Lex Vox se encuentra operativo. Voz masculina grave configurada en modo juridico legal.';
+
+  var u = crearUtterance(texto.substring(0, 400));
+  btn.textContent = '&#9632; Detener';
+  btn.style.color = '#c9a84c';
+  u.onend = u.onerror = function() {
+    btn.innerHTML = '&#9654; Vista Previa';
+    btn.style.color = '#8a8780';
+  };
+  synth.speak(u);
+}
+
+// ── GENERAR AUDIO ─────────────────────────────────────
+function doGen() {
+  var texto = document.getElementById('txt').value.trim();
+  if (!texto) { showMsg('warn', 'Por favor ingrese texto primero.'); return; }
+  if (!synth) { showMsg('err', 'Su navegador no soporta sintesis de voz. Use Google Chrome o Microsoft Edge.'); return; }
+  if (!VOZ) { showMsg('warn', 'Motor de voz cargando, espere un momento e intente de nuevo.'); return; }
+
+  synth.cancel();
+  var btn = document.getElementById('btnG');
+  btn.disabled = true;
+  btn.textContent = 'Generando...';
+  hideMsg();
+  setProg(5, 'Iniciando motor de voz...');
+
+  // Intentar grabar con MediaRecorder
+  var puedeGrabar = !!(window.MediaRecorder &&
+    navigator.mediaDevices && navigator.mediaDevices.getUserMedia);
+
+  if (puedeGrabar) {
+    navigator.mediaDevices.getUserMedia({
+      audio: {
+        sampleRate: 48000,
+        channelCount: 2,
+        echoCancellation: false,
+        noiseSuppression: false,
+        autoGainControl: false
+      }
+    }).then(function(stream) {
+      grabarAudio(stream, texto, btn);
+    }).catch(function() {
+      reproducirDirecto(texto, btn);
+    });
+  } else {
+    reproducirDirecto(texto, btn);
+  }
+}
+
+function grabarAudio(stream, texto, btn) {
+  chunks = [];
+  var mime = ['audio/webm;codecs=opus','audio/webm','audio/ogg']
+    .find(function(t) { return MediaRecorder.isTypeSupported(t); }) || '';
+
+  rec = new MediaRecorder(stream, mime ? { mimeType: mime, audioBitsPerSecond: 192000 } : {});
+  rec.ondataavailable = function(e) { if (e.data && e.data.size > 0) chunks.push(e.data); };
+
+  rec.onstop = function() {
+    stream.getTracks().forEach(function(t) { t.stop(); });
+    var ext = mime.indexOf('ogg') >= 0 ? 'ogg' : 'webm';
+    var blob = new Blob(chunks, { type: mime || 'audio/webm' });
+    var url = URL.createObjectURL(blob);
+    document.getElementById('player').src = url;
+    var dl = document.getElementById('dlBtn');
+    dl.href = url;
+    dl.download = 'lex-vox-' + Date.now() + '.' + ext;
+    dl.textContent = '&#8595; Descargar (' + ext.toUpperCase() + ')';
+    terminar(btn);
+  };
+
+  rec.start(100);
+  document.getElementById('btnS').style.display = 'inline-block';
+  setProg(30, 'Grabando voz masculina grave...');
+
+  var u = crearUtterance(texto);
+  u.onstart = function() { setProg(55, 'Sintetizando audio...'); };
+  u.onend = function() {
+    setProg(90, 'Finalizando...');
+    setTimeout(function() {
+      if (rec && rec.state !== 'inactive') rec.stop();
+    }, 800);
+  };
+  u.onerror = function() {
+    if (rec && rec.state !== 'inactive') rec.stop();
+  };
+  synth.speak(u);
+}
+
+function reproducirDirecto(texto, btn) {
+  setProg(40, 'Reproduciendo...');
+  document.getElementById('btnS').style.display = 'inline-block';
+  var u = crearUtterance(texto);
+  u.onstart = function() { setProg(70, 'Locutando texto...'); };
+  u.onend = function() {
+    var dl = document.getElementById('dlBtn');
+    dl.href = '#'; dl.removeAttribute('download');
+    dl.textContent = '&#9654; Reproducir de nuevo';
+    dl.onclick = function(e) {
+      e.preventDefault();
+      reproducirDirecto(document.getElementById('txt').value.trim(), btn);
+    };
+    showMsg('info', 'Para descargar el archivo de audio, haga clic en Generar de nuevo y acepte el permiso de microfono cuando el navegador lo solicite.');
+    terminar(btn);
+  };
+  u.onerror = function() {
+    btn.disabled = false; btn.textContent = '&#9834; Generar Audio MP3';
+    hideProg(); document.getElementById('btnS').style.display = 'none';
+    showMsg('err', 'Error en la sintesis de voz. Verifique que su navegador es Chrome o Edge.');
+  };
+  synth.speak(u);
+}
+
+function doStop() {
+  synth.cancel();
+  if (rec && rec.state !== 'inactive') rec.stop();
+  document.getElementById('btnS').style.display = 'none';
+  document.getElementById('btnG').disabled = false;
+  document.getElementById('btnG').textContent = '&#9834; Generar Audio MP3';
+  hideProg();
+}
+
+function terminar(btn) {
+  setProg(100, 'Audio listo');
+  setTimeout(function() { hideProg(); }, 900);
+  btn.disabled = false;
+  btn.textContent = '&#9834; Generar Audio MP3';
+  document.getElementById('btnS').style.display = 'none';
+  document.getElementById('resbox').style.display = 'block';
+  buildWave(); actualizarStats();
+  document.getElementById('resbox').scrollIntoView({ behavior: 'smooth', block: 'nearest' });
+}
+
+// ── ONDA DE AUDIO ─────────────────────────────────────
+function buildWave() {
+  var wf = document.getElementById('wavebox');
+  wf.innerHTML = '';
+  var c = ['#c9a84c','#e8c96e','#a07028','#b08038','#f5dfa0'];
+  for (var i = 0; i < 100; i++) {
+    var b = document.createElement('div');
+    b.style.cssText = 'border-radius:1px;flex:1;min-width:2px;height:' +
+      (4 + Math.random() * 44) + 'px;opacity:' +
+      (0.1 + Math.random() * 0.8).toFixed(2) + ';background:' +
+      c[Math.floor(Math.random() * c.length)] + ';';
+    wf.appendChild(b);
+  }
+}
+
+function updT() {
+  var a = document.getElementById('player');
+  function f(s) { return Math.floor(s/60) + ':' + (Math.floor(s%60) < 10 ? '0' : '') + Math.floor(s%60); }
+  document.getElementById('tInfo').textContent = f(a.currentTime||0) + ' / ' + f(a.duration||0);
+}
+
+actualizarStats();
+</script>
+</body>
+</html>
