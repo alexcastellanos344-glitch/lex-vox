@@ -1,0 +1,396 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Lex Vox</title>
+</head>
+<body style="margin:0;padding:0;background:#0a0a0c;color:#ece9e0;font-family:Georgia,serif;">
+
+<!-- HEADER -->
+<div style="background:#050507;border-bottom:3px solid #c9a84c;padding:30px 20px;text-align:center;">
+  <h1 style="font-family:Arial,sans-serif;font-size:32px;font-weight:900;letter-spacing:8px;color:#e8c96e;margin:0 0 8px 0;text-transform:uppercase;">Lex Vox</h1>
+  <p style="font-family:Arial,sans-serif;font-size:12px;color:#6a6860;letter-spacing:3px;margin:0;text-transform:uppercase;">Sistema de Sintesis de Voz Juridica &bull; Voz Masculina Grave Profesional</p>
+</div>
+
+<!-- BANNER -->
+<div style="background:#0a1222;border-bottom:1px solid #3a6a9a;padding:9px 20px;text-align:center;font-family:Arial,sans-serif;font-size:11px;letter-spacing:2px;color:#6a9fcf;text-transform:uppercase;">
+  Motor: ElevenLabs AI &bull; Voz masculina grave &bull; MP3 real &bull; Calidad profesional
+</div>
+
+<div style="max-width:800px;margin:0 auto;padding:20px 16px 40px;">
+
+  <!-- CREDITOS -->
+  <div id="creditosBox" style="background:#111115;border:1px solid #2a2a35;border-radius:4px;margin-bottom:16px;padding:14px 18px;display:flex;align-items:center;justify-content:space-between;flex-wrap:gap;">
+    <div>
+      <div style="font-family:Arial,sans-serif;font-size:9px;letter-spacing:2px;color:#6a6860;text-transform:uppercase;margin-bottom:4px;">Creditos ElevenLabs disponibles</div>
+      <div id="creditosVal" style="font-family:Arial,sans-serif;font-size:22px;color:#e8c96e;font-weight:400;">Verificando...</div>
+    </div>
+    <div style="text-align:right;">
+      <div style="font-family:Arial,sans-serif;font-size:9px;letter-spacing:2px;color:#6a6860;text-transform:uppercase;margin-bottom:4px;">Voz activa</div>
+      <div id="vozActiva" style="font-family:Arial,sans-serif;font-size:13px;color:#c9a84c;letter-spacing:1px;">Cargando...</div>
+    </div>
+  </div>
+
+  <!-- PANEL ENTRADA -->
+  <div style="background:#111115;border:1px solid #2a2a35;border-radius:4px;margin-bottom:16px;">
+    <div style="background:#16161c;border-bottom:1px solid #2a2a35;padding:10px 18px;display:flex;align-items:center;justify-content:space-between;">
+      <span style="font-family:Arial,sans-serif;font-size:10px;letter-spacing:2px;color:#6a6860;text-transform:uppercase;">Texto a Convertir</span>
+      <span style="background:#c9a84c;color:#000;font-family:Arial,sans-serif;font-size:9px;font-weight:700;padding:2px 8px;letter-spacing:1px;text-transform:uppercase;">TXT &middot; PDF &middot; DOCX &middot; PNG</span>
+    </div>
+
+    <!-- DROP -->
+    <div id="dropzone" style="border:1px dashed #2e2e3c;margin:18px 18px 0;padding:22px 20px;text-align:center;cursor:pointer;border-radius:4px;position:relative;">
+      <input type="file" id="fileIn" accept=".txt,.pdf,.docx,.doc,.png,.jpg,.jpeg,.bmp,.webp" multiple style="position:absolute;top:0;left:0;width:100%;height:100%;opacity:0;cursor:pointer;">
+      <div style="font-size:28px;margin-bottom:8px;">&#128196;</div>
+      <div style="font-size:15px;color:#ece9e0;margin-bottom:4px;">Arrastre su documento aqui o haga clic</div>
+      <div style="font-family:Arial,sans-serif;font-size:11px;color:#6a6860;">TXT &bull; PDF &bull; Word .docx &bull; PNG &bull; JPG</div>
+    </div>
+
+    <div style="display:flex;align-items:center;gap:10px;padding:12px 18px 6px;color:#6a6860;font-size:11px;font-family:Arial,sans-serif;letter-spacing:2px;text-transform:uppercase;">
+      <div style="flex:1;height:1px;background:#2a2a35;"></div>o escriba directamente<div style="flex:1;height:1px;background:#2a2a35;"></div>
+    </div>
+
+    <textarea id="txt" rows="7" style="display:block;width:calc(100% - 36px);margin:0 18px;background:#18181e;border:1px solid #2a2a35;border-radius:4px;color:#ece9e0;font-family:Georgia,serif;font-size:15px;line-height:1.8;padding:14px;resize:vertical;outline:none;box-sizing:border-box;" placeholder="Ingrese o pegue el texto juridico aqui..."></textarea>
+
+    <div style="display:flex;background:#2a2a35;gap:1px;margin-top:1px;">
+      <div style="background:#16161c;padding:8px 12px;font-family:Arial,sans-serif;font-size:9px;color:#6a6860;text-transform:uppercase;flex:1;letter-spacing:1px;">Palabras<br><b id="sw" style="color:#e8c96e;font-size:13px;font-weight:400;">0</b></div>
+      <div style="background:#16161c;padding:8px 12px;font-family:Arial,sans-serif;font-size:9px;color:#6a6860;text-transform:uppercase;flex:1;letter-spacing:1px;">Caracteres<br><b id="sc" style="color:#e8c96e;font-size:13px;font-weight:400;">0</b></div>
+      <div style="background:#16161c;padding:8px 12px;font-family:Arial,sans-serif;font-size:9px;color:#6a6860;text-transform:uppercase;flex:1;letter-spacing:1px;">Paginas<br><b id="sp" style="color:#e8c96e;font-size:13px;font-weight:400;">0</b></div>
+      <div style="background:#16161c;padding:8px 12px;font-family:Arial,sans-serif;font-size:9px;color:#6a6860;text-transform:uppercase;flex:1;letter-spacing:1px;">Creditos usara<br><b id="credUso" style="color:#e8c96e;font-size:13px;font-weight:400;">0</b></div>
+    </div>
+  </div>
+
+  <!-- ALERTAS -->
+  <div id="msg" style="display:none;margin-bottom:16px;padding:12px 16px;border-radius:4px;font-family:Arial,sans-serif;font-size:13px;line-height:1.5;"></div>
+
+  <!-- PANEL ACCION -->
+  <div style="background:#111115;border:1px solid #2a2a35;border-radius:4px;margin-bottom:16px;">
+    <div style="background:#16161c;border-bottom:1px solid #2a2a35;padding:10px 18px;">
+      <span style="font-family:Arial,sans-serif;font-size:10px;letter-spacing:2px;color:#6a6860;text-transform:uppercase;">Generar Audio MP3 &mdash; ElevenLabs AI &mdash; Voz Masculina Grave</span>
+    </div>
+    <div id="progwrap" style="display:none;padding:14px 18px 0;">
+      <div style="display:flex;justify-content:space-between;margin-bottom:6px;">
+        <span id="progLbl" style="font-family:Arial,sans-serif;font-size:10px;color:#6a6860;text-transform:uppercase;letter-spacing:1px;">Procesando...</span>
+        <span id="progPct" style="font-family:Arial,sans-serif;font-size:10px;color:#e8c96e;">0%</span>
+      </div>
+      <div style="height:3px;background:#2a2a35;border-radius:2px;overflow:hidden;">
+        <div id="progfill" style="height:100%;background:#c9a84c;width:0%;transition:width 0.4s;"></div>
+      </div>
+    </div>
+    <div style="padding:16px 18px;display:flex;gap:10px;flex-wrap:wrap;">
+      <button onclick="doGen()" id="btnG" style="flex:1;min-width:200px;background:#c9a84c;color:#000;border:none;padding:14px;font-family:Arial,sans-serif;font-size:12px;letter-spacing:3px;text-transform:uppercase;font-weight:700;cursor:pointer;border-radius:4px;">&#9834; Generar Audio MP3</button>
+    </div>
+  </div>
+
+  <!-- RESULTADO -->
+  <div id="resbox" style="display:none;background:#111115;border:1px solid #2a2a35;border-radius:4px;margin-bottom:16px;">
+    <div style="background:#16161c;border-bottom:1px solid #2a2a35;padding:10px 18px;display:flex;justify-content:space-between;align-items:center;">
+      <span style="font-family:Arial,sans-serif;font-size:10px;letter-spacing:2px;color:#6a6860;text-transform:uppercase;">Audio MP3 Generado</span>
+      <span style="background:#0a1c0a;color:#6abf3a;border:1px solid #3a8a1a;font-family:Arial,sans-serif;font-size:9px;font-weight:700;padding:2px 8px;letter-spacing:1px;text-transform:uppercase;">&#10003; MP3 Listo</span>
+    </div>
+    <div id="wavebox" style="height:52px;display:flex;align-items:center;gap:2px;padding:16px 18px 0;overflow:hidden;"></div>
+    <audio id="player" controls style="width:calc(100% - 36px);margin:12px 18px 0;display:block;" ontimeupdate="updT()"></audio>
+    <div style="padding:12px 18px 16px;display:flex;align-items:center;gap:10px;flex-wrap:wrap;">
+      <div id="tInfo" style="font-family:Arial,sans-serif;font-size:11px;color:#6a6860;flex:1;letter-spacing:1px;">--</div>
+      <a id="dlBtn" href="#" download="lex-vox-legal.mp3" style="background:#c9a84c;color:#000;padding:10px 24px;font-family:Arial,sans-serif;font-size:11px;letter-spacing:2px;text-transform:uppercase;font-weight:700;cursor:pointer;border-radius:4px;text-decoration:none;display:inline-block;">&#8595; Descargar MP3</a>
+    </div>
+    <div style="display:flex;background:#2a2a35;gap:1px;border-top:1px solid #2a2a35;">
+      <div style="background:#111115;padding:10px 14px;font-family:Arial,sans-serif;font-size:9px;color:#6a6860;text-transform:uppercase;flex:1;letter-spacing:1px;">Palabras<br><b id="mw" style="color:#e8c96e;font-size:12px;font-weight:400;">--</b></div>
+      <div style="background:#111115;padding:10px 14px;font-family:Arial,sans-serif;font-size:9px;color:#6a6860;text-transform:uppercase;flex:1;letter-spacing:1px;">Duracion<br><b id="md" style="color:#e8c96e;font-size:12px;font-weight:400;">--</b></div>
+      <div style="background:#111115;padding:10px 14px;font-family:Arial,sans-serif;font-size:9px;color:#6a6860;text-transform:uppercase;flex:1;letter-spacing:1px;">Motor<br><b style="color:#e8c96e;font-size:12px;font-weight:400;">ElevenLabs</b></div>
+      <div style="background:#111115;padding:10px 14px;font-family:Arial,sans-serif;font-size:9px;color:#6a6860;text-transform:uppercase;flex:1;letter-spacing:1px;">Formato<br><b style="color:#e8c96e;font-size:12px;font-weight:400;">MP3 192kbps</b></div>
+    </div>
+  </div>
+
+</div>
+
+<div style="text-align:center;padding:24px 16px;border-top:1px solid #2a2a35;font-family:Arial,sans-serif;font-size:10px;color:#4a4840;letter-spacing:2px;text-transform:uppercase;">
+  Lex Vox &bull; Sintesis de Voz Juridica &bull; v6.0 &bull; ElevenLabs AI
+</div>
+
+<script>
+// ══════════════════════════════════════════════════════
+// LEX VOX v6.0 — ElevenLabs API
+// Voz masculina grave profesional — MP3 real 192kbps
+// ══════════════════════════════════════════════════════
+
+var API_KEY = 'sk_ab1031993ccebc7e00486df91dd698bd96644bd99236dbae';
+
+// Voces masculinas graves disponibles en ElevenLabs
+// Orden de prioridad: Adam (deep), Antoni (well-rounded), Josh (deep)
+var VOCES_CANDIDATAS = [
+  { id: 'pNInz6obpgDQGcFmaJgB', nombre: 'Adam — Grave Profundo' },
+  { id: 'ErXwobaYiN019PkySvjV', nombre: 'Antoni — Grave Masculino' },
+  { id: 'TxGEqnHWrfWFTfGW9XjX', nombre: 'Josh — Grave Natural' },
+  { id: 'VR6AewLTigWG4xSOukaG', nombre: 'Arnold — Autoridad' },
+  { id: 'yoZ06aMxZJJ28mfd3POQ', nombre: 'Sam — Profundo' }
+];
+
+var VOZ_ID   = VOCES_CANDIDATAS[0].id;
+var VOZ_NOMBRE = VOCES_CANDIDATAS[0].nombre;
+
+// ── INICIALIZAR ───────────────────────────────────────
+window.addEventListener('load', function() {
+  verificarCreditos();
+  document.getElementById('vozActiva').textContent = VOZ_NOMBRE;
+});
+
+// ── VERIFICAR CREDITOS ────────────────────────────────
+function verificarCreditos() {
+  fetch('https://api.elevenlabs.io/v1/user', {
+    headers: { 'xi-api-key': API_KEY }
+  })
+  .then(function(r) { return r.json(); })
+  .then(function(data) {
+    var restantes = data.subscription
+      ? (data.subscription.character_limit - data.subscription.character_count)
+      : '?';
+    document.getElementById('creditosVal').textContent =
+      restantes.toLocaleString() + ' caracteres restantes';
+  })
+  .catch(function() {
+    document.getElementById('creditosVal').textContent = 'No se pudo verificar';
+  });
+}
+
+// ── LECTURA DE ARCHIVOS ───────────────────────────────
+document.getElementById('fileIn').addEventListener('change', function(e) {
+  var files = Array.from(e.target.files);
+  if (!files.length) return;
+  showMsg('info', 'Leyendo archivo...');
+  var todo = '', done = 0;
+  files.forEach(function(file) {
+    var ext = file.name.split('.').pop().toLowerCase();
+    if (['txt','csv','md','json'].indexOf(ext) >= 0) {
+      var r = new FileReader();
+      r.onload = function(ev) {
+        todo += ev.target.result + '\n\n';
+        done++;
+        if (done === files.length) terminarLectura(todo, files);
+      };
+      r.readAsText(file, 'UTF-8');
+    } else {
+      todo += '[' + file.name + '] Copie el texto de este archivo y peguelo en el campo.\n\n';
+      done++;
+      if (done === files.length) terminarLectura(todo, files);
+    }
+  });
+});
+
+function terminarLectura(texto, files) {
+  document.getElementById('txt').value = texto.trim();
+  showMsg('ok', 'Archivo cargado: ' + files.map(function(f){return f.name;}).join(', '));
+  actualizarStats();
+}
+
+var dz = document.getElementById('dropzone');
+dz.addEventListener('dragover', function(e){ e.preventDefault(); dz.style.borderColor='#c9a84c'; });
+dz.addEventListener('dragleave', function(){ dz.style.borderColor='#2e2e3c'; });
+dz.addEventListener('drop', function(e){
+  e.preventDefault(); dz.style.borderColor='#2e2e3c';
+  var dt = new DataTransfer();
+  Array.from(e.dataTransfer.files).forEach(function(f){ dt.items.add(f); });
+  document.getElementById('fileIn').files = dt.files;
+  document.getElementById('fileIn').dispatchEvent(new Event('change'));
+});
+
+document.getElementById('txt').addEventListener('input', actualizarStats);
+
+// ── ESTADISTICAS ──────────────────────────────────────
+function actualizarStats() {
+  var t = document.getElementById('txt').value.trim();
+  var w = t ? t.split(/\s+/).filter(function(x){return x;}).length : 0;
+  var c = document.getElementById('txt').value.length;
+  var p = Math.ceil(w / 250) || 0;
+  var s = w > 0 ? Math.round((w / 130) * 60) : 0;
+  var dur = s > 0 ? Math.floor(s/60)+':'+(s%60<10?'0':'')+(s%60) : '--';
+  document.getElementById('sw').textContent = w.toLocaleString();
+  document.getElementById('sc').textContent = c.toLocaleString();
+  document.getElementById('sp').textContent = p;
+  document.getElementById('credUso').textContent = c.toLocaleString();
+  document.getElementById('mw').textContent = w > 0 ? w.toLocaleString() : '--';
+  document.getElementById('md').textContent = dur;
+}
+
+// ── UI ────────────────────────────────────────────────
+function showMsg(tipo, txt) {
+  var el = document.getElementById('msg');
+  var estilos = {
+    ok:   'background:#0a1c0a;border:1px solid #3a8a1a;color:#6abf3a;',
+    warn: 'background:#1a140a;border:1px solid #5a3a0a;color:#c8a060;',
+    err:  'background:#1c0a0a;border:1px solid #8a1a1a;color:#c06060;',
+    info: 'background:#0a1222;border:1px solid #3a6a9a;color:#6a9fcf;'
+  };
+  el.style.cssText = 'display:block;margin-bottom:16px;padding:12px 16px;border-radius:4px;font-family:Arial,sans-serif;font-size:13px;line-height:1.5;' + estilos[tipo];
+  el.textContent = txt;
+}
+
+function setProg(pct, lbl) {
+  document.getElementById('progwrap').style.display = 'block';
+  document.getElementById('progfill').style.width = pct + '%';
+  document.getElementById('progPct').textContent = Math.round(pct) + '%';
+  if (lbl) document.getElementById('progLbl').textContent = lbl;
+}
+function hideProg() { document.getElementById('progwrap').style.display = 'none'; }
+
+// ── GENERAR CON ELEVENLABS ────────────────────────────
+function doGen() {
+  var texto = document.getElementById('txt').value.trim();
+  if (!texto) { showMsg('warn', 'Por favor ingrese texto primero.'); return; }
+
+  // ── NORMALIZAR TEXTO ANTES DE ENVIAR ──────────────────
+  texto = normalizarTexto(texto);
+
+  if (texto.length > 5000) {
+    showMsg('warn', 'El texto supera 5,000 caracteres. Divida el documento en partes para conservar creditos.');
+    return;
+  }
+
+  var btn = document.getElementById('btnG');
+  btn.disabled = true;
+  btn.textContent = 'Generando con ElevenLabs...';
+  showMsg('info', 'Conectando con ElevenLabs AI — generando voz masculina grave...');
+  setProg(20, 'Enviando texto a ElevenLabs...');
+
+  // Configuracion de voz: estabilidad alta, similaridad alta, sin exageracion
+  var body = JSON.stringify({
+    text: texto,
+    model_id: 'eleven_multilingual_v2',
+    voice_settings: {
+      stability: 0.75,
+      similarity_boost: 0.85,
+      style: 0.0,
+      use_speaker_boost: true
+    }
+  });
+
+  setProg(40, 'Sintetizando voz profesional...');
+
+  fetch('https://api.elevenlabs.io/v1/text-to-speech/' + VOZ_ID + '?output_format=mp3_22050_32', {
+    method: 'POST',
+    headers: {
+      'xi-api-key': API_KEY,
+      'Content-Type': 'application/json',
+      'Accept': 'audio/mpeg'
+    },
+    body: body
+  })
+  .then(function(response) {
+    if (!response.ok) {
+      return response.json().then(function(err) {
+        throw new Error(err.detail ? err.detail.message || JSON.stringify(err.detail) : 'Error en ElevenLabs');
+      });
+    }
+    setProg(75, 'Descargando audio MP3...');
+    return response.blob();
+  })
+  .then(function(blob) {
+    setProg(95, 'Preparando archivo...');
+    var url = URL.createObjectURL(blob);
+    var audio = document.getElementById('player');
+    audio.src = url;
+
+    var dl = document.getElementById('dlBtn');
+    dl.href = url;
+    dl.download = 'lex-vox-legal-' + Date.now() + '.mp3';
+    dl.textContent = 'Descargar MP3';
+
+    setProg(100, 'MP3 listo');
+    setTimeout(hideProg, 900);
+
+    btn.disabled = false;
+    btn.textContent = 'Generar Audio MP3';
+
+    document.getElementById('resbox').style.display = 'block';
+    buildWave();
+    actualizarStats();
+    verificarCreditos();
+    document.getElementById('resbox').scrollIntoView({ behavior: 'smooth', block: 'nearest' });
+    showMsg('ok', 'Audio MP3 generado correctamente con voz masculina grave profesional.');
+  })
+  .catch(function(err) {
+    hideProg();
+    btn.disabled = false;
+    btn.textContent = 'Generar Audio MP3';
+    showMsg('err', 'Error: ' + err.message + '. Verifique su conexion a internet o intente de nuevo.');
+    console.error(err);
+  });
+}
+
+// ── ONDA ──────────────────────────────────────────────
+function buildWave() {
+  var wf = document.getElementById('wavebox');
+  wf.innerHTML = '';
+  var c = ['#c9a84c','#e8c96e','#a07028','#b08038','#f5dfa0'];
+  for (var i = 0; i < 100; i++) {
+    var b = document.createElement('div');
+    b.style.cssText = 'border-radius:1px;flex:1;min-width:2px;height:' +
+      (4+Math.random()*44)+'px;opacity:'+(0.1+Math.random()*0.8).toFixed(2)+
+      ';background:'+c[Math.floor(Math.random()*c.length)]+';';
+    wf.appendChild(b);
+  }
+}
+
+function updT() {
+  var a = document.getElementById('player');
+  function f(s){ return Math.floor(s/60)+':'+(Math.floor(s%60)<10?'0':'')+Math.floor(s%60); }
+  document.getElementById('tInfo').textContent = f(a.currentTime||0)+' / '+f(a.duration||0);
+}
+
+// ── NORMALIZACION DE TEXTO JURIDICO ───────────────────
+function normalizarTexto(t) {
+  var abrev = [
+    [/\bEXP\.?\s*:/gi,       'Expediente:'],
+    [/\bEXP\.?\b/gi,         'Expediente'],
+    [/\bExp\.?\s*:/gi,       'Expediente:'],
+    [/\bExp\.?\b/gi,         'Expediente'],
+    [/\bArt\.\s*/gi,         'Artículo '],
+    [/\barts\.\s*/gi,        'Artículos '],
+    [/\bNum\.\s*/gi,         'Número '],
+    [/\bNúm\.\s*/gi,         'Número '],
+    [/\bNo\.\s*/gi,          'Número '],
+    [/\bN°\s*/gi,            'Número '],
+    [/\bNro\.\s*/gi,         'Número '],
+    [/\bAbg\.\s*/gi,         'Abogado '],
+    [/\bABG\.\s*/gi,         'Abogado '],
+    [/\bLic\.\s*/gi,         'Licenciado '],
+    [/\bLda\.\s*/gi,         'Licenciada '],
+    [/\bDr\.\s*/gi,          'Doctor '],
+    [/\bDra\.\s*/gi,         'Doctora '],
+    [/\bSr\.\s*/gi,          'Señor '],
+    [/\bSra\.\s*/gi,         'Señora '],
+    [/\bvs\.\s*/gi,          'versus '],
+    [/\bVs\.\s*/gi,          'versus '],
+    [/\bpág\.\s*/gi,         'página '],
+    [/\bPág\.\s*/gi,         'Página '],
+    [/\bet al\.\s*/gi,       'y otros '],
+    [/\bIbid\.\s*/gi,        'ibídem '],
+    [/\bPJ\b/g,              'Poder Judicial'],
+    [/\bMP\b/g,              'Ministerio Público'],
+    [/\bCSJ\b/g,             'Corte Suprema de Justicia'],
+    [/\bTSC\b/g,             'Tribunal Superior de Cuentas'],
+    [/\bRNP\b/g,             'Registro Nacional de las Personas'],
+    [/&/g,                   ' y '],
+    [/%/g,                   ' por ciento'],
+    [/\((\d+)\)/g, function(m, n) {
+      var p = ['cero','uno','dos','tres','cuatro','cinco','seis','siete','ocho',
+        'nueve','diez','once','doce','trece','catorce','quince','dieciséis',
+        'diecisiete','dieciocho','diecinueve','veinte','veintiuno','veintidós',
+        'veintitrés','veinticuatro','veinticinco','veintiséis','veintisiete',
+        'veintiocho','veintinueve','treinta'];
+      var num = parseInt(n);
+      return '(' + (num < p.length ? p[num] : n) + ')';
+    }],
+    [/\.{3,}/g,              '. '],
+    [/\s+-\s+/g,             ', '],
+    [/\s{2,}/g,              ' ']
+  ];
+  abrev.forEach(function(par) { t = t.replace(par[0], par[1]); });
+  return t.trim();
+}
+
+actualizarStats();
+</script>
+</body>
+</html>
