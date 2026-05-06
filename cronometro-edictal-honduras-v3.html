@@ -1,0 +1,498 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Cronómetro Edictal — Poder Judicial Honduras</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Playfair+Display:wght@400;600;700&family=DM+Sans:ital,wght@0,300;0,400;0,500;1,400&family=DM+Mono:wght@400;500&display=swap" rel="stylesheet">
+<script src="https://cdnjs.cloudflare.com/ajax/libs/pdf.js/3.11.174/pdf.min.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/mammoth/1.6.0/mammoth.browser.min.js"></script>
+<style>
+:root {
+  --ink: #1a1612; --ink2: #3d352d; --ink3: #7a6f65;
+  --paper: #f5f0e8; --paper2: #ede7d9; --paper3: #e3dace;
+  --seal: #8b1a1a; --seal-light: #f7eded;
+  --gold: #b8860b; --gold-light: #fdf6e3;
+  --green: #1a5c2e; --green-light: #e8f4ec;
+  --blue: #1a3a6c; --blue-light: #e8eef7;
+  --border: rgba(26,22,18,0.12); --border2: rgba(26,22,18,0.20);
+  --shadow: 0 2px 16px rgba(26,22,18,0.09);
+  --shadow-lg: 0 12px 56px rgba(26,22,18,0.22);
+  --r: 5px; --r-lg: 10px;
+}
+*, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+body {
+  font-family: 'DM Sans', sans-serif;
+  background: var(--paper); color: var(--ink); min-height: 100vh;
+  background-image:
+    repeating-linear-gradient(0deg, transparent, transparent 31px, rgba(26,22,18,0.025) 31px, rgba(26,22,18,0.025) 32px),
+    repeating-linear-gradient(90deg, transparent, transparent 31px, rgba(26,22,18,0.015) 31px, rgba(26,22,18,0.015) 32px);
+}
+
+/* HEADER */
+header { background: var(--ink); position: relative; overflow: hidden; }
+header::before { content: ''; position: absolute; inset: 0; pointer-events: none; background: repeating-linear-gradient(-45deg, transparent, transparent 10px, rgba(255,255,255,0.012) 10px, rgba(255,255,255,0.012) 11px); }
+.hdr { max-width: 960px; margin: 0 auto; padding: 30px 32px 26px; display: flex; align-items: center; gap: 18px; position: relative; }
+.hdr-seal { width: 56px; height: 56px; border-radius: 50%; border: 1.5px solid rgba(255,255,255,0.22); display: flex; align-items: center; justify-content: center; font-size: 22px; flex-shrink: 0; background: rgba(255,255,255,0.04); }
+.hdr-text h1 { font-family: 'Playfair Display', serif; font-size: 22px; font-weight: 700; color: #fff; line-height: 1.2; }
+.hdr-text h1 em { font-style: normal; color: rgba(255,255,255,0.38); font-weight: 400; }
+.hdr-sub { font-size: 11.5px; color: rgba(255,255,255,0.4); margin-top: 4px; font-weight: 300; }
+.hdr-badge { display: inline-flex; align-items: center; gap: 5px; background: rgba(26,92,46,0.32); border: 1px solid rgba(26,92,46,0.5); border-radius: 99px; padding: 3px 11px; font-size: 9.5px; color: #7ecfa0; font-weight: 500; margin-top: 7px; }
+.hdr-badge::before { content: '●'; font-size: 6px; }
+
+/* MAIN */
+main { max-width: 960px; margin: 0 auto; padding: 26px 32px 64px; display: grid; grid-template-columns: 1fr 340px; gap: 22px; align-items: start; }
+
+/* PANEL */
+.panel { background: #faf7f2; border: 1px solid var(--border2); border-radius: var(--r-lg); overflow: hidden; box-shadow: var(--shadow); }
+.panel + .panel { margin-top: 16px; }
+.ph { padding: 12px 18px; border-bottom: 1px solid var(--border); background: var(--paper2); display: flex; align-items: center; gap: 9px; }
+.ph-icon { width: 26px; height: 26px; border-radius: var(--r); background: var(--ink); color: var(--paper); display: flex; align-items: center; justify-content: center; font-size: 12px; flex-shrink: 0; }
+.ph-title { font-family: 'Playfair Display', serif; font-size: 14px; font-weight: 600; color: var(--ink); }
+.pb { padding: 18px 20px; }
+
+/* UPLOAD */
+.upload-zone { border: 1.5px dashed var(--border2); border-radius: var(--r-lg); padding: 22px 20px; text-align: center; cursor: pointer; background: #fff; transition: all 0.2s; margin-bottom: 14px; position: relative; }
+.upload-zone:hover, .upload-zone.drag { border-color: var(--seal); background: var(--seal-light); }
+.upload-zone input[type=file] { position: absolute; inset: 0; opacity: 0; cursor: pointer; width: 100%; height: 100%; }
+.uz-icon { font-size: 26px; margin-bottom: 7px; }
+.uz-title { font-family: 'Playfair Display', serif; font-size: 13.5px; color: var(--ink); font-weight: 600; }
+.uz-sub { font-size: 11px; color: var(--ink3); margin-top: 3px; }
+.uz-formats { display: flex; justify-content: center; gap: 6px; margin-top: 10px; flex-wrap: wrap; }
+.fmt-pill { font-size: 10px; font-weight: 500; padding: 3px 9px; border-radius: 99px; border: 1px solid var(--border2); color: var(--ink3); }
+.fmt-pill.pdf { border-color: #c0392b; color: #c0392b; }
+.fmt-pill.docx { border-color: #1a3a6c; color: #1a3a6c; }
+.fmt-pill.img { border-color: #1a5c2e; color: #1a5c2e; }
+
+/* STATUS */
+.proc-state { display: none; align-items: center; gap: 12px; padding: 12px 14px; background: var(--blue-light); border: 1px solid rgba(26,58,108,0.2); border-radius: var(--r); margin-bottom: 12px; }
+.proc-state.on { display: flex; }
+.spinner { width: 16px; height: 16px; border: 2px solid rgba(26,58,108,0.2); border-top-color: var(--blue); border-radius: 50%; animation: spin 0.7s linear infinite; flex-shrink: 0; }
+@keyframes spin { to { transform: rotate(360deg); } }
+.proc-txt { font-size: 12px; color: var(--blue); font-weight: 500; }
+.proc-sub { font-size: 10px; color: rgba(26,58,108,0.6); margin-top: 1px; }
+
+.file-tag { display: none; align-items: center; gap: 8px; padding: 8px 12px; background: var(--paper2); border: 1px solid var(--border2); border-radius: var(--r); margin-bottom: 10px; }
+.file-tag.on { display: flex; }
+.ft-icon { font-size: 15px; flex-shrink: 0; }
+.ft-name { font-size: 11.5px; color: var(--ink); font-weight: 500; flex: 1; min-width: 0; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+.ft-remove { background: none; border: none; color: var(--ink3); cursor: pointer; font-size: 14px; padding: 0 2px; flex-shrink: 0; }
+.ft-remove:hover { color: var(--seal); }
+.err-box { display: none; padding: 9px 13px; background: #fdf0ee; border: 1px solid rgba(192,57,43,0.3); border-radius: var(--r); font-size: 11px; color: #c0392b; margin-bottom: 10px; }
+.err-box.on { display: block; }
+.ocr-note { display: none; font-size: 10.5px; color: var(--blue); background: var(--blue-light); border: 1px solid rgba(26,58,108,0.18); border-radius: var(--r); padding: 8px 12px; margin-bottom: 10px; }
+.ocr-note.on { display: block; }
+
+/* TEXTAREA */
+textarea { width: 100%; min-height: 200px; resize: vertical; font-family: 'DM Mono', monospace; font-size: 12px; line-height: 1.75; color: var(--ink); background: #fff; border: 1px solid var(--border2); border-radius: var(--r); padding: 14px 16px; transition: border-color 0.15s; display: block; }
+textarea:focus { outline: none; border-color: var(--seal); }
+textarea::placeholder { color: var(--ink3); font-style: italic; }
+.txt-actions { display: flex; gap: 6px; margin-top: 8px; flex-wrap: wrap; }
+.btn-ghost { font-size: 11px; font-family: 'DM Sans', sans-serif; color: var(--ink3); background: transparent; border: 1px solid var(--border2); border-radius: var(--r); padding: 5px 11px; cursor: pointer; transition: all 0.1s; }
+.btn-ghost:hover { background: var(--paper3); color: var(--ink); }
+
+/* METRICS SMALL */
+.metrics-sm { display: grid; grid-template-columns: repeat(3,1fr); gap: 8px; margin-top: 14px; }
+.msm { background: var(--paper2); border: 1px solid var(--border); border-radius: var(--r); padding: 9px; text-align: center; }
+.msm-val { font-family: 'Playfair Display', serif; font-size: 17px; font-weight: 600; color: var(--ink); line-height: 1; }
+.msm-lbl { font-size: 9px; color: var(--ink3); margin-top: 3px; text-transform: uppercase; letter-spacing: 0.4px; }
+
+/* ══════════════════════════════════
+   RESULT — HERO
+══════════════════════════════════ */
+.result-hero {
+  background: var(--ink);
+  border-radius: var(--r-lg);
+  padding: 28px 24px 24px;
+  color: var(--paper);
+  position: relative;
+  overflow: hidden;
+  box-shadow: var(--shadow-lg);
+  text-align: center;
+}
+.result-hero::before {
+  content: '';
+  position: absolute; top: -60px; left: 50%; transform: translateX(-50%);
+  width: 240px; height: 240px; border-radius: 50%;
+  background: radial-gradient(ellipse, rgba(139,26,26,0.18) 0%, transparent 70%);
+  pointer-events: none;
+}
+.rh-label { font-size: 9px; text-transform: uppercase; letter-spacing: 1.5px; color: rgba(255,255,255,0.32); margin-bottom: 10px; }
+.rh-time {
+  font-family: 'Playfair Display', serif;
+  font-size: 80px; font-weight: 700;
+  color: #fff; line-height: 1;
+  letter-spacing: -4px;
+  transition: opacity 0.2s;
+}
+.rh-time .u { font-size: 32px; font-weight: 400; color: rgba(255,255,255,0.38); letter-spacing: 0; margin-left: 3px; }
+.rh-exact {
+  font-family: 'DM Mono', monospace;
+  font-size: 13px; font-weight: 500;
+  color: rgba(255,255,255,0.55);
+  margin-top: 10px;
+  letter-spacing: 0.3px;
+}
+.rh-minutos {
+  font-family: 'DM Mono', monospace;
+  font-size: 11px;
+  color: rgba(255,255,255,0.28);
+  margin-top: 3px;
+}
+.rh-divider { height: 1px; background: rgba(255,255,255,0.07); margin: 18px 0 14px; }
+.rh-stats { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; text-align: left; }
+.rhs { }
+.rhs-val { font-family: 'DM Mono', monospace; font-size: 15px; font-weight: 500; color: #fff; }
+.rhs-lbl { font-size: 9.5px; color: rgba(255,255,255,0.32); margin-top: 2px; text-transform: uppercase; letter-spacing: 0.4px; }
+.rh-badge-row { display: flex; justify-content: center; gap: 6px; margin-top: 16px; flex-wrap: wrap; }
+.rhb { font-size: 9.5px; font-weight: 500; padding: 4px 12px; border-radius: 99px; border: 1px solid rgba(255,255,255,0.12); color: rgba(255,255,255,0.5); }
+.rhb-ok { background: rgba(26,92,46,0.28); border-color: rgba(26,92,46,0.45); color: #7ecfa0; }
+.rhb-warn { background: rgba(184,134,11,0.22); border-color: rgba(184,134,11,0.38); color: #e8b94a; }
+
+/* CALIBRACION PANEL */
+.calib-panel {
+  background: rgba(26,92,46,0.08);
+  border: 1px solid rgba(26,92,46,0.2);
+  border-radius: var(--r-lg);
+  padding: 14px 16px;
+}
+.calib-title { font-size: 10px; font-weight: 500; text-transform: uppercase; letter-spacing: 0.6px; color: var(--green); margin-bottom: 10px; }
+.calib-row { display: flex; justify-content: space-between; align-items: baseline; padding: 4px 0; border-bottom: 1px solid rgba(26,92,46,0.1); }
+.calib-row:last-child { border-bottom: none; }
+.calib-key { font-size: 10.5px; color: var(--ink3); }
+.calib-val { font-family: 'DM Mono', monospace; font-size: 11px; font-weight: 500; color: var(--green); }
+
+/* TIPO DOC PANEL */
+.tipo-panel { }
+
+/* FOOTER */
+footer { background: var(--ink2); color: rgba(255,255,255,0.28); text-align: center; padding: 16px; font-size: 10px; letter-spacing: 0.3px; }
+footer strong { color: rgba(255,255,255,0.45); }
+
+/* RESPONSIVE */
+@media (max-width: 700px) {
+  main { grid-template-columns: 1fr; padding: 16px 14px 48px; }
+  .hdr { padding: 20px 14px 16px; }
+  .metrics-sm { grid-template-columns: repeat(3,1fr); }
+  .rh-time { font-size: 60px; letter-spacing: -2px; }
+  .rh-time .u { font-size: 24px; }
+  .sidebar { order: -1; }
+}
+</style>
+</head>
+<body>
+
+<header>
+  <div class="hdr">
+    <div class="hdr-seal">⚖️</div>
+    <div class="hdr-text">
+      <h1>Cronómetro Edictal <em>Honduras</em></h1>
+      <div class="hdr-sub">Poder Judicial · Duración exacta de comunicaciones edictales en voz radial</div>
+      <div class="hdr-badge">Calibrado con audio real — Juzgado de Letras La Ceiba, Atlántida 2026</div>
+    </div>
+  </div>
+</header>
+
+<main>
+  <!-- LEFT -->
+  <div>
+    <div class="panel">
+      <div class="ph">
+        <div class="ph-icon">📂</div>
+        <div class="ph-title">Cargar documento</div>
+      </div>
+      <div class="pb">
+        <div class="upload-zone" id="drop-zone">
+          <input type="file" id="file-input" accept=".pdf,.docx,.doc,.jpg,.jpeg,.png,.txt" onchange="handleFile(this.files[0])">
+          <div class="uz-icon">📄</div>
+          <div class="uz-title">Arrastre un archivo aquí o haga clic para seleccionar</div>
+          <div class="uz-sub">El texto se extrae automáticamente</div>
+          <div class="uz-formats">
+            <span class="fmt-pill pdf">PDF</span>
+            <span class="fmt-pill docx">DOCX / DOC</span>
+            <span class="fmt-pill img">JPG / PNG</span>
+            <span class="fmt-pill">TXT</span>
+          </div>
+        </div>
+
+        <div class="file-tag" id="file-tag">
+          <span class="ft-icon" id="ft-icon">📄</span>
+          <span class="ft-name" id="ft-name"></span>
+          <button class="ft-remove" onclick="clearFile()">✕</button>
+        </div>
+        <div class="proc-state" id="proc-state">
+          <div class="spinner"></div>
+          <div><div class="proc-txt" id="proc-txt">Procesando…</div><div class="proc-sub" id="proc-sub"></div></div>
+        </div>
+        <div class="err-box" id="err-box"></div>
+        <div class="ocr-note" id="ocr-note">📷 Texto extraído por OCR con inteligencia artificial. Revise antes de calcular.</div>
+      </div>
+    </div>
+
+    <div class="panel">
+      <div class="ph">
+        <div class="ph-icon">📝</div>
+        <div class="ph-title">Texto del documento</div>
+      </div>
+      <div class="pb">
+        <textarea id="txt"
+          placeholder="El texto extraído del documento aparecerá aquí. También puede escribir o pegar texto directamente."
+          oninput="calc()" spellcheck="false"></textarea>
+        <div class="txt-actions">
+          <button class="btn-ghost" onclick="loadSample()">📋 Ejemplo (Jaime Rivera)</button>
+          <button class="btn-ghost" onclick="clearAll()">✕ Limpiar</button>
+        </div>
+        <div class="metrics-sm">
+          <div class="msm"><div class="msm-val" id="m-w">—</div><div class="msm-lbl">Palabras</div></div>
+          <div class="msm"><div class="msm-val" id="m-c">—</div><div class="msm-lbl">Caracteres</div></div>
+          <div class="msm"><div class="msm-val" id="m-n">—</div><div class="msm-lbl">Cifras/siglas</div></div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- RIGHT / SIDEBAR -->
+  <div class="sidebar">
+
+    <!-- RESULTADO HERO -->
+    <div class="result-hero">
+      <div class="rh-label">Duración de transmisión</div>
+      <div class="rh-time" id="rh-time">—</div>
+      <div class="rh-exact" id="rh-exact">Ingrese o cargue un documento</div>
+      <div class="rh-minutos" id="rh-min"></div>
+      <div class="rh-divider"></div>
+      <div class="rh-stats">
+        <div class="rhs"><div class="rhs-val" id="st-palabras">—</div><div class="rhs-lbl">Palabras</div></div>
+        <div class="rhs"><div class="rhs-val" id="st-seg">—</div><div class="rhs-lbl">Segundos totales</div></div>
+      </div>
+      <div class="rh-badge-row" id="rh-badges"></div>
+    </div>
+
+    <!-- CALIBRACIÓN (solo lectura) -->
+    <div class="calib-panel">
+      <div class="calib-title">✓ Estándar de calibración</div>
+      <div class="calib-row"><span class="calib-key">Velocidad de locución</span><span class="calib-val">190.2 ppm</span></div>
+      <div class="calib-row"><span class="calib-key">Factor de pausa jurídica</span><span class="calib-val">×1.0683</span></div>
+      <div class="calib-row"><span class="calib-key">Fuente</span><span class="calib-val">Audio real HN 2026</span></div>
+      <div class="calib-row"><span class="calib-key">Perfil</span><span class="calib-val">Radio · Edictal</span></div>
+    </div>
+
+    <!-- TIPO DE DOC -->
+    <div class="panel tipo-panel">
+      <div class="ph">
+        <div class="ph-icon">⚙️</div>
+        <div class="ph-title">Tipo de documento</div>
+      </div>
+      <div class="pb" style="padding: 14px 18px;">
+        <select id="doctype" onchange="calc()" style="width:100%;font-family:'DM Sans',sans-serif;font-size:12.5px;color:var(--ink);background:#fff;border:1px solid var(--border2);border-radius:var(--r);padding:8px 10px;cursor:pointer;">
+          <option value="edicto">Comunicación edictal</option>
+          <option value="auto">Auto / resolución</option>
+          <option value="sentencia">Sentencia / fallo</option>
+          <option value="contrato">Escritura pública / contrato</option>
+          <option value="certificacion">Certificación / constancia</option>
+        </select>
+      </div>
+    </div>
+
+  </div>
+</main>
+
+<footer>
+  <strong>Cronómetro Edictal Honduras</strong> &nbsp;·&nbsp; Calibración basada en audio real — Juzgado de Letras, Sección Judicial de La Ceiba, Atlántida · 2026
+</footer>
+
+<script>
+pdfjsLib.GlobalWorkerOptions.workerSrc = 'https://cdnjs.cloudflare.com/ajax/libs/pdf.js/3.11.174/pdf.worker.min.js';
+
+/* ── CONSTANTES FIJAS — NO MODIFICABLES ── */
+const WPM   = 190.2;
+const PAUSE = 1.0683;
+
+/* ── DRAG & DROP ── */
+const dropZone = document.getElementById('drop-zone');
+dropZone.addEventListener('dragover', e => { e.preventDefault(); dropZone.classList.add('drag'); });
+dropZone.addEventListener('dragleave', () => dropZone.classList.remove('drag'));
+dropZone.addEventListener('drop', e => { e.preventDefault(); dropZone.classList.remove('drag'); const f = e.dataTransfer.files[0]; if (f) handleFile(f); });
+
+const ICONS = { pdf:'📕', docx:'📘', doc:'📘', txt:'📄', jpg:'🖼️', jpeg:'🖼️', png:'🖼️' };
+
+async function handleFile(file) {
+  if (!file) return;
+  const ext = file.name.split('.').pop().toLowerCase();
+  showTag(file.name, ICONS[ext] || '📄');
+  hideErr(); hideOcr();
+  try {
+    let text = '';
+    if      (ext === 'pdf')                      text = await extractPDF(file);
+    else if (ext === 'docx' || ext === 'doc')    text = await extractDOCX(file);
+    else if (ext === 'txt')                      text = await extractTXT(file);
+    else if (['jpg','jpeg','png'].includes(ext))  text = await extractOCR(file);
+    else { showErr('Formato no compatible. Use PDF, DOCX, DOC, TXT, JPG o PNG.'); return; }
+
+    if (!text || text.trim().length < 5) { showErr('No se pudo extraer texto. Verifique que el documento no esté protegido.'); return; }
+    document.getElementById('txt').value = text.trim();
+    calc();
+  } catch(e) { showErr('Error al procesar: ' + (e.message || 'error desconocido')); }
+}
+
+async function extractPDF(file) {
+  setProc('Extrayendo texto del PDF…', '');
+  const buf = await file.arrayBuffer();
+  const pdf = await pdfjsLib.getDocument({ data: buf }).promise;
+  let out = '';
+  for (let i = 1; i <= pdf.numPages; i++) {
+    setProc('Extrayendo texto del PDF…', `Página ${i} de ${pdf.numPages}`);
+    const page = await pdf.getPage(i);
+    const content = await page.getTextContent();
+    out += content.items.map(x => x.str).join(' ') + '\n\n';
+  }
+  hideProc(); return out;
+}
+
+async function extractDOCX(file) {
+  setProc('Extrayendo texto del documento Word…', 'Procesando');
+  const buf = await file.arrayBuffer();
+  const res = await mammoth.extractRawText({ arrayBuffer: buf });
+  hideProc(); return res.value;
+}
+
+async function extractTXT(file) {
+  setProc('Leyendo archivo…', '');
+  return new Promise((res, rej) => {
+    const r = new FileReader();
+    r.onload = e => { hideProc(); res(e.target.result); };
+    r.onerror = () => { hideProc(); rej(new Error('No se pudo leer')); };
+    r.readAsText(file, 'UTF-8');
+  });
+}
+
+async function extractOCR(file) {
+  setProc('Extrayendo texto de la imagen con IA…', 'OCR en proceso…');
+  const b64 = await toB64(file);
+  const mime = file.type || 'image/jpeg';
+  const resp = await fetch('https://api.anthropic.com/v1/messages', {
+    method: 'POST',
+    headers: { 'Content-Type': 'application/json' },
+    body: JSON.stringify({
+      model: 'claude-sonnet-4-20250514', max_tokens: 2000,
+      messages: [{ role: 'user', content: [
+        { type: 'image', source: { type: 'base64', media_type: mime, data: b64 } },
+        { type: 'text', text: 'Transcribe EXACTAMENTE todo el texto visible en esta imagen de documento legal hondureño. Solo el texto, sin comentarios.' }
+      ]}]
+    })
+  });
+  hideProc();
+  if (!resp.ok) { const e = await resp.json().catch(()=>({})); throw new Error(e.error?.message || 'Error OCR'); }
+  const data = await resp.json();
+  const text = (data.content || []).map(b => b.text || '').join('');
+  if (text) showOcr();
+  return text;
+}
+
+function toB64(file) {
+  return new Promise((res, rej) => {
+    const r = new FileReader();
+    r.onload = e => res(e.target.result.split(',')[1]);
+    r.onerror = rej;
+    r.readAsDataURL(file);
+  });
+}
+
+/* ── UI HELPERS ── */
+function setProc(t, s) { document.getElementById('proc-txt').textContent = t; document.getElementById('proc-sub').textContent = s; document.getElementById('proc-state').classList.add('on'); }
+function hideProc() { document.getElementById('proc-state').classList.remove('on'); }
+function showTag(name, icon) { document.getElementById('ft-name').textContent = name; document.getElementById('ft-icon').textContent = icon; document.getElementById('file-tag').classList.add('on'); }
+function hideTag() { document.getElementById('file-tag').classList.remove('on'); }
+function showErr(m) { const e = document.getElementById('err-box'); e.textContent = '⚠ ' + m; e.classList.add('on'); }
+function hideErr() { document.getElementById('err-box').classList.remove('on'); }
+function showOcr() { document.getElementById('ocr-note').classList.add('on'); }
+function hideOcr() { document.getElementById('ocr-note').classList.remove('on'); }
+function clearFile() { hideTag(); hideErr(); hideOcr(); hideProc(); document.getElementById('file-input').value = ''; }
+function clearAll() { clearFile(); document.getElementById('txt').value = ''; calc(); }
+
+/* ── CÁLCULO ── */
+function numExtra(txt) {
+  const nums = txt.match(/\b\d[\d,.\-()]*\b/g) || [];
+  let ex = 0;
+  nums.forEach(n => {
+    const d = n.replace(/\D/g,'').length;
+    if (d<=2) ex+=0.4; else if (d<=6) ex+=0.8+(d-2)*0.25; else ex+=1.8+(d-6)*0.4;
+  });
+  ex += (txt.match(/\b[A-ZÁÉÍÓÚ\.]{2,}\b/g)||[]).length * 0.5;
+  return ex;
+}
+
+function calc() {
+  const txt = document.getElementById('txt').value;
+  const words = txt.trim() === '' ? [] : txt.trim().split(/\s+/).filter(w => w.length > 0);
+  const wc = words.length;
+  const cc = txt.replace(/\s/g,'').length;
+  const nums = (txt.match(/\b\d[\d,.\-()]*\b/g)||[]).length;
+  const sigs = (txt.match(/\b[A-ZÁÉÍÓÚ\.]{2,}\b/g)||[]).length;
+  const paras = txt.trim() === '' ? 0 : txt.split(/\n\s*\n/).filter(p=>p.trim()).length;
+
+  document.getElementById('m-w').textContent = wc ? wc.toLocaleString('es-HN') : '—';
+  document.getElementById('m-c').textContent = cc ? cc.toLocaleString('es-HN') : '—';
+  document.getElementById('m-n').textContent = (nums+sigs) ? (nums+sigs).toLocaleString('es-HN') : '—';
+
+  if (wc === 0) {
+    document.getElementById('rh-time').innerHTML = '—';
+    document.getElementById('rh-exact').textContent = 'Ingrese o cargue un documento';
+    document.getElementById('rh-min').textContent = '';
+    document.getElementById('st-palabras').textContent = '—';
+    document.getElementById('st-seg').textContent = '—';
+    document.getElementById('rh-badges').innerHTML = '';
+    return;
+  }
+
+  const base     = (wc / WPM) * 60;
+  const pauseSec = base * (PAUSE - 1);
+  const numSec   = numExtra(txt);
+  const paraSec  = Math.max(0, (paras - 1)) * 0.8;
+  const opening  = 0.5;
+  const total    = base + pauseSec + numSec + paraSec + opening;
+
+  /* Formato del tiempo principal */
+  const h = Math.floor(total / 3600);
+  const m = Math.floor((total % 3600) / 60);
+  const s = Math.round(total % 60);
+
+  let timeHTML = '';
+  if (h > 0) {
+    timeHTML = h + '<span class="u">h</span> ' + String(m).padStart(2,'0') + '<span class="u">m</span> ' + String(s).padStart(2,'0') + '<span class="u">s</span>';
+  } else if (m > 0) {
+    timeHTML = m + '<span class="u">m</span> ' + String(s).padStart(2,'0') + '<span class="u">s</span>';
+  } else {
+    timeHTML = s + '<span class="u">s</span>';
+  }
+
+  document.getElementById('rh-time').innerHTML = timeHTML;
+  document.getElementById('rh-exact').textContent = total.toFixed(3) + ' segundos exactos';
+  document.getElementById('rh-min').textContent = (total / 60).toFixed(4) + ' minutos';
+  document.getElementById('st-palabras').textContent = wc.toLocaleString('es-HN');
+  document.getElementById('st-seg').textContent = Math.round(total).toLocaleString('es-HN');
+
+  const mins = total / 60;
+  let bHTML = '';
+  if (mins < 1)      bHTML = '<span class="rhb rhb-ok">Aviso breve</span>';
+  else if (mins < 2) bHTML = '<span class="rhb rhb-ok">Extensión normal</span>';
+  else if (mins < 4) bHTML = '<span class="rhb">Edicto estándar</span>';
+  else               bHTML = '<span class="rhb rhb-warn">Documento extenso</span>';
+  document.getElementById('rh-badges').innerHTML = bHTML;
+}
+
+function loadSample() {
+  clearFile();
+  document.getElementById('txt').value = `COMUNICACION EDICTAL.
+
+La Infrascrita Secretaria Adjunta del Juzgado de Letras de la Sección Judicial de La Ceiba, departamento de Atlántida, al público en general y para los efectos de ley, HACE SABER: Que en la Demanda de Ejecución Hipotecaria registrada bajo el número de expediente 0101-2025-494-2(EF) promovida por el Abogado CHESTER DWIGTH MILLA MEJIA como Apoderado Legal de la Sociedad Mercantil denominada BANCO DE AMERICA CENTRAL HONDURAS S.A., contra el señor JAIME MAURICIO RIVERA PAGOADA en su condición de deudor principal.- Se ha solicitado la Publicación de Edictos, en virtud de desconocerse el paradero del ejecutado, ordenándose requerir al señor JAIME MAURICIO RIVERA PAGOADA, para el pago de la cantidad de UN MILLON OCHOCIENTOS CUARENTA Y TRES MIL NOVECIENTOS SEIS LEMPIRAS CON VEINTICINCO CENTAVOS (L. 1,843,906.25) más los interés y costas del presente juicio, bajo la advertencia que en caso de no pagar o consignar la cantidad reclamada, se librara mandamiento al Instituto de la Propiedad correspondiente para que deje constancia de dicho requerimiento y una vez inscrito deberá certificar todas las cargas que afecten el inmueble a subastarse.- Así mismo podrán presentar oposición a la ejecución promovida en su contra, por escrito, alegando los motivos de la Oposición a la Ejecución establecidos en la Ley, la cual podrán realizar con anterioridad a la convocatoria de Subasta.- Haciéndole del conocimiento al ejecutado que las copias y los anexos de la demanda se encuentran a su disposición en la secretaria del Juzgado de Letras de la Sección Judicial de La Ceiba, Atlántida.- Publicación que deberá realizarse a costa de la parte ejecutante, por lo tanto, publíquese la comunicación edictal en un diario impreso y en una radiodifusora en ambos casos de cobertura nacional por tres (3) veces con intervalo de diez (10) días hábiles.- Haciéndole la advertencia al ejecutante que no se aceptara publicación que no haya realizado en tamaño normal de fácil lectura.-
+La Ceiba, Departamento de Atlántida, a los DIEZ (10) día del mes de ABRIL del año DOS MIL VEINTISEIS (2026).`;
+  calc();
+}
+
+calc();
+</script>
+</body>
+</html>
